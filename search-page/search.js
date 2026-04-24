@@ -456,7 +456,7 @@ groupSheetAction.addEventListener("click", () => {
   }
 
   savePendingGroup(activeGroup);
-  window.location.href = "../request%20sent%20page/index.html";
+  window.location.href = "../request-sent-page/index.html";
 });
 
 groupSheetLink.addEventListener("click", closeGroupSheet);
