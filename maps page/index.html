@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maps Page</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js"></script>
+    <script src="maps.js" defer></script>
+  </head>
+  <body>
+    <div class="phone-viewport">
+      <main class="page">
+        <header class="hero-banner">
+          <h1 class="page-title">Map</h1>
+          <p class="page-subtitle">Find groups happening nearby</p>
+        </header>
+
+        <section class="map-card" aria-label="Interactive map">
+          <div class="map-shell">
+            <div
+              id="map-frame"
+              class="map-frame"
+              title="Nearby map"
+              aria-label="Nearby map"
+            ></div>
+          </div>
+
+          <section class="location-panel" aria-live="polite">
+            <p class="status-label" id="status-label">Locating you…</p>
+            <h2 class="location-title" id="location-title">Loading map</h2>
+            <p class="location-meta" id="location-meta">Fetching approximate location from APIIP</p>
+          </section>
+        </section>
+
+        <nav class="bottom-nav" aria-label="Bottom navigation">
+          <a class="nav-item" href="../homepage/index.html" aria-label="Home">
+            <img class="nav-icon" src="./icons/home.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item" href="../messages%20page/index.html" aria-label="Messages">
+            <img class="nav-icon" src="./icons/messages.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item" href="../search%20page/index.html" aria-label="Search">
+            <img class="nav-icon" src="./icons/search2.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item nav-item-active" href="#" aria-label="Map" aria-current="page">
+            <img class="nav-icon" src="./icons/map.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item" href="../my%20groups%20page/index.html" aria-label="Profile">
+            <img class="nav-icon" src="./icons/person.svg" alt="" aria-hidden="true" />
+          </a>
+        </nav>
+      </main>
+    </div>
+  </body>
+</html>

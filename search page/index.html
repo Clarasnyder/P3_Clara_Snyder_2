@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Page</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js"></script>
+    <script src="search.js" defer></script>
+  </head>
+  <body>
+    <div class="phone-viewport">
+      <main class="page" data-node-id="122:340" data-name="iPhone 16 &amp; 17 Pro - 14">
+        <header class="hero-banner" data-node-id="146:505"></header>
+
+        <section class="map-layer" aria-label="Interactive map background">
+          <div
+            id="map-frame"
+            class="map-frame"
+            title="Interactive map"
+            aria-label="Interactive map"
+          ></div>
+        </section>
+
+        <div class="search-area">
+          <div class="search-pill" data-node-id="122:345">
+            <input
+              class="search-input"
+              id="search-input"
+              type="text"
+              placeholder="Search"
+              aria-label="Search"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="search-dropdown is-hidden" id="search-dropdown" aria-live="polite">
+            <div class="search-suggestions" id="search-suggestions" role="listbox"></div>
+          </div>
+        </div>
+
+        <section class="group-sheet" id="group-sheet" aria-hidden="true">
+          <div class="group-sheet-handle" aria-hidden="true"></div>
+          <div class="group-sheet-content">
+            <h2 class="group-sheet-title" id="group-sheet-title">Pickleball</h2>
+            <div class="group-sheet-members">
+              <div class="group-sheet-avatars" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <p class="group-sheet-members-text" id="group-sheet-members">24 members</p>
+            </div>
+            <p class="group-sheet-description" id="group-sheet-description">
+              Group description goes here.
+            </p>
+            <div class="group-sheet-actions">
+              <button class="group-sheet-action" id="group-sheet-action" type="button">Request to link</button>
+              <button class="group-sheet-link" id="group-sheet-link" type="button">Enter invite code</button>
+            </div>
+          </div>
+        </section>
+
+        <nav class="bottom-nav" data-node-id="146:495" aria-label="Bottom navigation">
+          <a class="nav-item" href="../homepage/index.html" aria-label="Home">
+            <img class="nav-icon" src="./icons/home.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item" href="../messages%20page/index.html" aria-label="Messages">
+            <img class="nav-icon" src="./icons/messages.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item nav-item-active" href="#" aria-label="Search" aria-current="page">
+            <img class="nav-icon" src="./icons/search2.svg" alt="" aria-hidden="true" />
+          </a>
+          <a class="nav-item" href="../my%20groups%20page/index.html" aria-label="Profile">
+            <img class="nav-icon" src="./icons/person.svg" alt="" aria-hidden="true" />
+          </a>
+        </nav>
+      </main>
+    </div>
+  </body>
+</html>
