@@ -5,49 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Feed Page</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="homepage.js" defer></script>
   </head>
   <body>
     <div class="phone-viewport">
       <main class="page" data-node-id="2:3" data-name="Feed page">
-        <header class="hero-banner" data-node-id="120:334"></header>
+        <header class="hero-banner" data-node-id="120:334">
+          <img
+            class="hero-logo"
+            src="../assets/icons/link.svg"
+            alt="Link"
+            aria-hidden="true"
+          />
+        </header>
 
         <section class="scroll-region" aria-label="Scrollable feed content">
-          <section class="content-card card-one" data-node-id="120:337">
+          <section
+            class="content-card card-one"
+            data-node-id="120:337"
+            data-group-title="Brunch club"
+            data-group-members="24"
+            data-group-description="Welcoming local meetups for brunch plans, easy conversation, and trying new spots around Knoxville."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="../assets/photos/c9fddbe6153ba83bcd9c051fca39e911.jpg"
+                alt="Brunch spread on a table"
+              />
+            </div>
             <div class="card-actions">
               <button class="card-action-button" type="button">Request to link</button>
               <button class="card-action-link" type="button">Enter invite code</button>
             </div>
           </section>
-          <section class="content-card card-two" data-node-id="146:482">
+          <section
+            class="content-card card-two"
+            data-node-id="146:482"
+            data-group-title="Crafting crew"
+            data-group-members="19"
+            data-group-description="A nearby community that gets together for crafting nights, shared supplies, and relaxed weekend projects."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="../assets/photos/e68c81992aa09dce515b5a73f77d17b5.jpg"
+                alt="Friends crafting together around a table"
+              />
+            </div>
             <div class="card-actions">
               <button class="card-action-button" type="button">Request to link</button>
               <button class="card-action-link" type="button">Enter invite code</button>
             </div>
           </section>
-          <section class="content-card card-three" data-node-id="146:493">
+          <section
+            class="content-card card-three"
+            data-node-id="146:493"
+            data-group-title="Running club"
+            data-group-members="31"
+            data-group-description="Friendly meetups where people connect over neighborhood runs, training plans, and after-run coffee stops."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="../assets/photos/086eb8395f295c02db1d9057b29ac8db.jpg"
+                alt="A running group jogging together outdoors"
+              />
+            </div>
             <div class="card-actions">
               <button class="card-action-button" type="button">Request to link</button>
               <button class="card-action-link" type="button">Enter invite code</button>
             </div>
           </section>
-          <section class="content-card card-four">
+          <section
+            class="content-card card-four"
+            data-group-title="Book club"
+            data-group-members="16"
+            data-group-description="Casual social gatherings focused on monthly reads, low-pressure discussion, and meeting new people."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="../assets/photos/3723cc02753b813e8660dc46df4aeb83.jpg"
+                alt="A stack of colorful books for book club"
+              />
+            </div>
             <div class="card-actions">
               <button class="card-action-button" type="button">Request to link</button>
               <button class="card-action-link" type="button">Enter invite code</button>
             </div>
           </section>
-          <section class="content-card card-five">
+          <section
+            class="content-card card-five"
+            data-group-title="Art walk"
+            data-group-members="14"
+            data-group-description="Relaxed weekly hangs built around gallery nights, local events, and exploring creative spaces around town."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="../assets/photos/faabcc6e20809c777ad66da1535596b8.jpg"
+                alt="People walking through an art gallery exhibit"
+              />
+            </div>
             <div class="card-actions">
               <button class="card-action-button" type="button">Request to link</button>
               <button class="card-action-link" type="button">Enter invite code</button>
             </div>
           </section>
-          <section class="content-card card-six">
+          <section
+            class="content-card card-six"
+            data-group-title="Pickleball"
+            data-group-members="27"
+            data-group-description="Beginner-friendly meetups around town with easy games, open courts, and low-pressure social play."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="../assets/photos/13376d9329100fad84a023e5ff6c623f.jpg"
+                alt="Two people playing pickleball on a court"
+              />
+            </div>
             <div class="card-actions">
               <button class="card-action-button" type="button">Request to link</button>
               <button class="card-action-link" type="button">Enter invite code</button>
             </div>
           </section>
+        </section>
+
+        <section class="invite-modal" id="invite-modal" aria-hidden="true">
+          <div class="invite-modal-card">
+            <p class="invite-modal-title">Enter invite code</p>
+            <form class="invite-form" id="invite-form">
+              <input
+                class="invite-input"
+                id="invite-input"
+                type="text"
+                placeholder="Invite code"
+                aria-label="Invite code"
+                autocomplete="off"
+              />
+            </form>
+          </div>
+        </section>
+
+        <section class="request-overlay" id="request-overlay" aria-hidden="true">
+          <div class="request-overlay-panel">
+            <h1 class="request-overlay-title">Link request sent!</h1>
+            <p class="request-overlay-message">
+              You can check the status of this request in the "my groups" section of your personal
+              profile!
+            </p>
+          </div>
         </section>
 
         <nav class="bottom-nav" data-node-id="136:368" aria-label="Bottom navigation">

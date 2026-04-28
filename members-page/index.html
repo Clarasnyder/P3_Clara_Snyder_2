@@ -3,23 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Request Sent</title>
+    <title>Members</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="request-sent.js" defer></script>
+    <script src="members.js" defer></script>
   </head>
   <body>
     <div class="phone-viewport">
       <main class="page">
-        <header class="hero-banner"></header>
+        <header class="hero-banner">
+          <img
+            class="hero-logo"
+            src="../assets/icons/link.svg"
+            alt="Link"
+            aria-hidden="true"
+          />
+        </header>
 
-        <section class="confirmation-panel" aria-label="Request confirmation">
-          <div class="confirmation-card">
-            <h1 class="confirmation-title">Link request sent!</h1>
-            <p class="confirmation-message">
-              You can check the status of this request in the "my groups" section of your personal
-              profile!
-            </p>
+        <section class="members-shell" aria-label="Group members">
+          <div class="members-header">
+            <a class="back-link" id="back-link" href="../my-groups-page/index.html" aria-label="Back to group">
+              <span class="back-chevron" aria-hidden="true"></span>
+            </a>
+            <h1 class="members-title">Members</h1>
+            <p class="members-subtitle" id="members-subtitle">Group</p>
           </div>
+
+          <section class="member-rail" id="member-rail" aria-label="Member profiles"></section>
         </section>
 
         <nav class="bottom-nav" aria-label="Bottom navigation">
@@ -29,10 +38,10 @@
           <a class="nav-item" href="../messages-page/index.html" aria-label="Messages">
             <img class="nav-icon" src="../assets/icons/messages.svg" alt="" aria-hidden="true" />
           </a>
-          <a class="nav-item nav-item-active" href="../search-page/index.html" aria-label="Search" aria-current="page">
+          <a class="nav-item" href="../search-page/index.html" aria-label="Search">
             <img class="nav-icon" src="../assets/icons/search2.svg" alt="" aria-hidden="true" />
           </a>
-          <a class="nav-item" href="../my-groups-page/index.html" aria-label="Profile">
+          <a class="nav-item nav-item-active" href="../my-groups-page/index.html" aria-label="Profile" aria-current="page">
             <img class="nav-icon" src="../assets/icons/person.svg" alt="" aria-hidden="true" />
           </a>
         </nav>

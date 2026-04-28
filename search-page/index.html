@@ -15,7 +15,14 @@
   <body>
     <div class="phone-viewport">
       <main class="page" data-node-id="122:340" data-name="iPhone 16 &amp; 17 Pro - 14">
-        <header class="hero-banner" data-node-id="146:505"></header>
+        <header class="hero-banner" data-node-id="146:505">
+          <img
+            class="hero-logo"
+            src="../assets/icons/link.svg"
+            alt="Link"
+            aria-hidden="true"
+          />
+        </header>
 
         <section class="map-layer" aria-label="Interactive map background">
           <div
@@ -65,18 +72,44 @@
           </div>
         </section>
 
+        <section class="invite-modal" id="invite-modal" aria-hidden="true">
+          <div class="invite-modal-card">
+            <p class="invite-modal-title">Enter invite code</p>
+            <form class="invite-form" id="invite-form">
+              <input
+                class="invite-input"
+                id="invite-input"
+                type="text"
+                placeholder="Invite code"
+                aria-label="Invite code"
+                autocomplete="off"
+              />
+            </form>
+          </div>
+        </section>
+
+        <section class="request-overlay" id="request-overlay" aria-hidden="true">
+          <div class="request-overlay-panel">
+            <h1 class="request-overlay-title">Link request sent!</h1>
+            <p class="request-overlay-message">
+              You can check the status of this request in the "my groups" section of your personal
+              profile!
+            </p>
+          </div>
+        </section>
+
         <nav class="bottom-nav" data-node-id="146:495" aria-label="Bottom navigation">
           <a class="nav-item" href="../homepage/index.html" aria-label="Home">
-            <img class="nav-icon" src="./icons/home.svg" alt="" aria-hidden="true" />
+            <img class="nav-icon" src="../assets/icons/home.svg" alt="" aria-hidden="true" />
           </a>
           <a class="nav-item" href="../messages-page/index.html" aria-label="Messages">
-            <img class="nav-icon" src="./icons/messages.svg" alt="" aria-hidden="true" />
+            <img class="nav-icon" src="../assets/icons/messages.svg" alt="" aria-hidden="true" />
           </a>
           <a class="nav-item nav-item-active" href="#" aria-label="Search" aria-current="page">
-            <img class="nav-icon" src="./icons/search2.svg" alt="" aria-hidden="true" />
+            <img class="nav-icon" src="../assets/icons/search2.svg" alt="" aria-hidden="true" />
           </a>
           <a class="nav-item" href="../my-groups-page/index.html" aria-label="Profile">
-            <img class="nav-icon" src="./icons/person.svg" alt="" aria-hidden="true" />
+            <img class="nav-icon" src="../assets/icons/person.svg" alt="" aria-hidden="true" />
           </a>
         </nav>
       </main>

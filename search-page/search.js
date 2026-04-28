@@ -8,6 +8,10 @@ const groupSheetMembers = document.getElementById("group-sheet-members");
 const groupSheetDescription = document.getElementById("group-sheet-description");
 const groupSheetAction = document.getElementById("group-sheet-action");
 const groupSheetLink = document.getElementById("group-sheet-link");
+const inviteModal = document.getElementById("invite-modal");
+const inviteForm = document.getElementById("invite-form");
+const inviteInput = document.getElementById("invite-input");
+const requestOverlay = document.getElementById("request-overlay");
 const defaultCenter = [-83.9207, 35.9606];
 const styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 const storageKey = "linkRequests";
@@ -41,6 +45,24 @@ const marker = new maplibregl.Marker({
 const groupMarkers = [];
 let activeGroupId = null;
 let activeGroup = null;
+let requestOverlayTimeout = null;
+let requestOverlayFadeTimeout = null;
+const pageParams = new URLSearchParams(window.location.search);
+
+function readPendingTitles() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    const groups = Array.isArray(stored) ? stored : [];
+
+    return new Set(
+      groups
+        .filter((entry) => entry?.source === "request-link" && entry?.title)
+        .map((entry) => entry.title)
+    );
+  } catch (error) {
+    return new Set();
+  }
+}
 
 function applyMinimalTheme() {
   const style = map.getStyle();
@@ -69,7 +91,7 @@ function applyMinimalTheme() {
     }
 
     if (layer.type === "background") {
-      map.setPaintProperty(layer.id, "background-color", "#f7f3ea");
+      map.setPaintProperty(layer.id, "background-color", "#f4f8ff");
       return;
     }
 
@@ -82,8 +104,8 @@ function applyMinimalTheme() {
         layerName.includes("grass") ||
         layerName.includes("green");
 
-      map.setPaintProperty(layer.id, "fill-color", isWater ? "#d7edf8" : isPark ? "#dceccf" : "#f3eee2");
-      map.setPaintProperty(layer.id, "fill-outline-color", isPark ? "#bdd2ae" : "#d6cfbf");
+      map.setPaintProperty(layer.id, "fill-color", isWater ? "#dcebff" : isPark ? "#edf7d4" : "#f4f8ff");
+      map.setPaintProperty(layer.id, "fill-outline-color", isPark ? "#c8d8ad" : "#d4dff1");
       map.setPaintProperty(layer.id, "fill-opacity", isWater ? 0.94 : 1);
       return;
     }
@@ -97,12 +119,12 @@ function applyMinimalTheme() {
         map.setPaintProperty(
           layer.id,
           "text-color",
-          isPlaceLabel ? "#696055" : isRoadLabel ? "#84786d" : "#7f9470"
+          isPlaceLabel ? "#17243f" : isRoadLabel ? "#5f6f92" : "#6478ff"
         );
       }
 
       if (layer.paint && "text-halo-color" in layer.paint) {
-        map.setPaintProperty(layer.id, "text-halo-color", "rgba(255,255,255,0.92)");
+        map.setPaintProperty(layer.id, "text-halo-color", "rgba(244,248,255,0.94)");
       }
 
       if (layer.paint && "text-halo-width" in layer.paint) {
@@ -132,7 +154,7 @@ function applyMinimalTheme() {
       map.setPaintProperty(
         layer.id,
         "line-color",
-        isWater ? "#a8cfe1" : isBoundary ? "#c9c2ad" : isMajorRoad ? "#b59d82" : "#b9c7a4"
+        isWater ? "#92bad5" : isBoundary ? "#b8c6df" : isMajorRoad ? "#6478ff" : "#a8b7d4"
       );
       map.setPaintProperty(layer.id, "line-opacity", isRoad ? 0.78 : 0.46);
       map.setPaintProperty(
@@ -149,12 +171,6 @@ function applyMinimalTheme() {
     }
   });
 }
-
-map.once("load", () => {
-  map.resize();
-  applyMinimalTheme();
-  updateMap(defaultCenter[1], defaultCenter[0]);
-});
 
 const seedSuggestions = [
   "pickleball",
@@ -207,6 +223,26 @@ function toSearchLabel(value) {
   return value.replace(/^Search for "|"$|^Search for /g, "");
 }
 
+function getRestoreState() {
+  const query = toSearchLabel(pageParams.get("search") || "").trim();
+  const groupId = pageParams.get("groupId") || "";
+  const centerLat = Number.parseFloat(pageParams.get("centerLat") || "");
+  const centerLng = Number.parseFloat(pageParams.get("centerLng") || "");
+
+  if (!query) {
+    return null;
+  }
+
+  return {
+    query,
+    groupId,
+    center:
+      Number.isFinite(centerLat) && Number.isFinite(centerLng)
+        ? { lat: centerLat, lng: centerLng }
+        : getActiveCenter()
+  };
+}
+
 function hashString(value) {
   let hash = 2166136261;
 
@@ -243,11 +279,59 @@ function closeGroupSheet() {
   activeGroup = null;
 }
 
+function openInviteModal() {
+  if (!activeGroup) {
+    return;
+  }
+
+  inviteInput.value = "";
+  inviteModal.classList.add("is-open");
+  inviteModal.setAttribute("aria-hidden", "false");
+  window.setTimeout(() => inviteInput.focus(), 20);
+}
+
+function closeInviteModal() {
+  inviteModal.classList.remove("is-open");
+  inviteModal.setAttribute("aria-hidden", "true");
+}
+
+function showRequestOverlay(onComplete) {
+  if (!requestOverlay) {
+    return;
+  }
+
+  if (requestOverlayTimeout) {
+    window.clearTimeout(requestOverlayTimeout);
+  }
+
+  if (requestOverlayFadeTimeout) {
+    window.clearTimeout(requestOverlayFadeTimeout);
+  }
+
+  requestOverlay.classList.remove("is-fading");
+  requestOverlay.classList.add("is-open");
+  requestOverlay.setAttribute("aria-hidden", "false");
+
+  requestOverlayTimeout = window.setTimeout(() => {
+    requestOverlay.classList.add("is-fading");
+
+    requestOverlayFadeTimeout = window.setTimeout(() => {
+      requestOverlay.classList.remove("is-open", "is-fading");
+      requestOverlay.setAttribute("aria-hidden", "true");
+      if (typeof onComplete === "function") {
+        onComplete();
+      }
+    }, 550);
+  }, 1600);
+}
+
 function openGroupSheet(group) {
   groupSheetTitle.textContent = sentenceCase(group.label);
   groupSheetMembers.textContent = `${group.members} members`;
   groupSheetDescription.textContent = group.description;
-  groupSheetAction.textContent = "Request to link";
+  groupSheetAction.textContent = readPendingTitles().has(sentenceCase(group.label))
+    ? "Request sent!"
+    : "Request to link";
   groupSheetLink.textContent = "Enter invite code";
   groupSheet.classList.add("is-open");
   groupSheet.setAttribute("aria-hidden", "false");
@@ -321,13 +405,13 @@ function buildGroupResults(query, center = getActiveCenter()) {
   };
 }
 
-function renderGroupMarkers(query) {
-  const results = buildGroupResults(query);
+function renderGroupMarkers(query, options = {}) {
+  const results = buildGroupResults(query, options.center);
 
   if (!results.cleanedQuery) {
     clearGroupMarkers();
     closeGroupSheet();
-    return;
+    return null;
   }
 
   clearGroupMarkers();
@@ -353,6 +437,16 @@ function renderGroupMarkers(query) {
 
     groupMarkers.push(groupMarker);
   });
+
+  if (options.openGroupId) {
+    const matchedGroup = results.groups.find((group) => group.id === options.openGroupId);
+
+    if (matchedGroup) {
+      openGroupSheet(matchedGroup);
+    }
+  }
+
+  return results;
 }
 
 function sentenceCase(value) {
@@ -456,10 +550,36 @@ groupSheetAction.addEventListener("click", () => {
   }
 
   savePendingGroup(activeGroup);
-  window.location.href = "../request-sent-page/index.html";
+  closeInviteModal();
+  showRequestOverlay(() => {
+    groupSheetAction.textContent = "Request sent!";
+  });
 });
 
-groupSheetLink.addEventListener("click", closeGroupSheet);
+groupSheetLink.addEventListener("click", openInviteModal);
+
+inviteForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (!activeGroup || !inviteInput.value.trim()) {
+    return;
+  }
+
+  const center = getActiveCenter();
+
+  const params = new URLSearchParams({
+    title: sentenceCase(activeGroup.label),
+    members: String(activeGroup.members),
+    description: activeGroup.description,
+    back: "search",
+    search: activeGroup.label,
+    groupId: activeGroup.id,
+    centerLat: center.lat.toFixed(6),
+    centerLng: center.lng.toFixed(6)
+  });
+
+  window.location.href = `../group-page/index.html?${params.toString()}`;
+});
 
 groupSheet.addEventListener("click", (event) => {
   if (event.target === groupSheetAction || event.target === groupSheetLink) {
@@ -469,13 +589,25 @@ groupSheet.addEventListener("click", (event) => {
   closeGroupSheet();
 });
 
-function updateMap(lat, lon) {
+inviteModal.addEventListener("click", (event) => {
+  if (event.target === inviteModal) {
+    closeInviteModal();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && inviteModal.classList.contains("is-open")) {
+    closeInviteModal();
+  }
+});
+
+function updateMap(lat, lon, options = {}) {
   const center = [lon, lat];
   marker.setLngLat(center);
   map.easeTo({
     center,
     zoom: 12.8,
-    duration: 1200
+    duration: options.instant ? 0 : 1200
   });
 }
 
@@ -526,4 +658,35 @@ async function loadMapLocation() {
   }
 }
 
-loadMapLocation();
+function restoreSearchState() {
+  const restoreState = getRestoreState();
+
+  if (!restoreState) {
+    return false;
+  }
+
+  searchInput.value = restoreState.query;
+  dropdown.classList.add("is-hidden");
+  suggestionsRoot.innerHTML = "";
+  updateMap(restoreState.center.lat, restoreState.center.lng, { instant: true });
+  renderGroupMarkers(restoreState.query, {
+    center: restoreState.center,
+    openGroupId: restoreState.groupId
+  });
+  searchInput.blur();
+
+  return true;
+}
+
+map.once("load", () => {
+  map.resize();
+  applyMinimalTheme();
+
+  if (!restoreSearchState()) {
+    updateMap(defaultCenter[1], defaultCenter[0]);
+  }
+});
+
+if (!getRestoreState()) {
+  loadMapLocation();
+}

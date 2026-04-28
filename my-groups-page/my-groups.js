@@ -4,6 +4,18 @@ const baseGroups = [
   { title: "Brunch club", status: "" },
   { title: "Crafting crew", status: "" }
 ];
+const linkedGroups = {
+  "Brunch club": {
+    members: "24",
+    description:
+      "Welcoming local meetups for long brunches, easy conversation, and trying new spots around Knoxville."
+  },
+  "Crafting crew": {
+    members: "19",
+    description:
+      "A nearby community for relaxed craft nights, shared supplies, and weekend projects with new friends."
+  }
+};
 
 function resetPendingGroupsOnRefresh() {
   const navigationEntries = performance.getEntriesByType("navigation");
@@ -40,7 +52,8 @@ function renderGroups() {
   }
 
   groups.forEach((group) => {
-    const item = document.createElement("article");
+    const groupPageData = linkedGroups[group.title];
+    const item = document.createElement(groupPageData ? "a" : "article");
     const title = document.createElement("p");
     const status = document.createElement("span");
 
@@ -50,6 +63,17 @@ function renderGroups() {
 
     title.textContent = group.title;
     status.textContent = group.status || "";
+
+    if (groupPageData) {
+      const params = new URLSearchParams({
+        title: group.title,
+        members: groupPageData.members,
+        description: groupPageData.description,
+        back: "groups"
+      });
+
+      item.href = `../group-page/index.html?${params.toString()}`;
+    }
 
     if (!group.status) {
       status.classList.add("is-hidden");

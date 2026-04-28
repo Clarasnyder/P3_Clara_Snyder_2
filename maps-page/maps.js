@@ -59,14 +59,21 @@ function applyMinimalTheme() {
     }
 
     if (layer.type === "background") {
-      map.setPaintProperty(layer.id, "background-color", "#f7f2ef");
+      map.setPaintProperty(layer.id, "background-color", "#f4f8ff");
       return;
     }
 
     if (layer.type === "fill") {
       const isWater = layerName.includes("water");
-      map.setPaintProperty(layer.id, "fill-color", isWater ? "#dfeaf1" : "#f3ede7");
-      map.setPaintProperty(layer.id, "fill-outline-color", "#d3c8be");
+      const isPark =
+        layerName.includes("park") ||
+        layerName.includes("landuse") ||
+        layerName.includes("wood") ||
+        layerName.includes("grass") ||
+        layerName.includes("green");
+
+      map.setPaintProperty(layer.id, "fill-color", isWater ? "#dcebff" : isPark ? "#edf7d4" : "#f4f8ff");
+      map.setPaintProperty(layer.id, "fill-outline-color", isPark ? "#c8d8ad" : "#d4dff1");
       map.setPaintProperty(layer.id, "fill-opacity", isWater ? 0.94 : 1);
       return;
     }
@@ -80,12 +87,12 @@ function applyMinimalTheme() {
         map.setPaintProperty(
           layer.id,
           "text-color",
-          isPlaceLabel ? "#5f5550" : isRoadLabel ? "#736760" : "#8a7b73"
+          isPlaceLabel ? "#17243f" : isRoadLabel ? "#5f6f92" : "#6478ff"
         );
       }
 
       if (layer.paint && "text-halo-color" in layer.paint) {
-        map.setPaintProperty(layer.id, "text-halo-color", "rgba(255,255,255,0.92)");
+        map.setPaintProperty(layer.id, "text-halo-color", "rgba(244,248,255,0.94)");
       }
 
       if (layer.paint && "text-halo-width" in layer.paint) {
@@ -115,7 +122,7 @@ function applyMinimalTheme() {
       map.setPaintProperty(
         layer.id,
         "line-color",
-        isWater ? "#b9cdd8" : isBoundary ? "#c7b9b0" : isMajorRoad ? "#8e7d74" : "#b19e95"
+        isWater ? "#92bad5" : isBoundary ? "#b8c6df" : isMajorRoad ? "#6478ff" : "#a8b7d4"
       );
       map.setPaintProperty(layer.id, "line-opacity", isRoad ? 0.78 : 0.46);
       map.setPaintProperty(

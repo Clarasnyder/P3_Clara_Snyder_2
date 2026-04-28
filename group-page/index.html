@@ -9,12 +9,24 @@
   </head>
   <body>
     <div class="phone-viewport">
-      <main class="page">
-        <header class="hero-banner"></header>
+      <main class="page" id="group-page">
+        <header class="hero-banner">
+          <img
+            class="hero-logo"
+            src="../assets/icons/link.svg"
+            alt="Link"
+            aria-hidden="true"
+          />
+        </header>
 
         <section class="scroll-region" aria-label="Group details">
           <section class="group-header">
-            <h1 class="group-title" id="group-title">Pickleball</h1>
+            <div class="group-title-row">
+              <a class="back-link" id="back-link" href="../my-groups-page/index.html" aria-label="Back to my groups">
+                <span class="back-chevron" aria-hidden="true"></span>
+              </a>
+              <h1 class="group-title" id="group-title">Pickleball</h1>
+            </div>
             <div class="group-members">
               <div class="group-avatars" aria-hidden="true">
                 <span></span>
@@ -29,8 +41,8 @@
           </section>
 
           <section class="group-actions" aria-label="Group sections">
-            <button class="group-card" type="button">Members</button>
-            <button class="group-card" type="button">Events</button>
+            <button class="group-card" id="members-button" type="button">Members</button>
+            <button class="group-card" id="events-button" type="button">Events</button>
             <button class="group-card" type="button">Event Check-in</button>
           </section>
         </section>
