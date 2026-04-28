@@ -1,6 +1,7 @@
 const inviteModal = document.getElementById("invite-modal");
 const inviteForm = document.getElementById("invite-form");
 const inviteInput = document.getElementById("invite-input");
+const inviteLoadingOverlay = document.getElementById("invite-loading-overlay");
 const requestOverlay = document.getElementById("request-overlay");
 const contentCards = document.querySelectorAll(".content-card");
 const requestButtons = document.querySelectorAll(".card-action-button");
@@ -221,6 +222,15 @@ function closeInviteModal() {
   activeInviteGroup = null;
 }
 
+function openInviteLoading() {
+  if (!inviteLoadingOverlay) {
+    return;
+  }
+
+  inviteLoadingOverlay.classList.add("is-open");
+  inviteLoadingOverlay.setAttribute("aria-hidden", "false");
+}
+
 function showRequestOverlay(onComplete) {
   if (!requestOverlay) {
     return;
@@ -290,7 +300,12 @@ inviteForm.addEventListener("submit", (event) => {
     back: "home"
   });
 
-  window.location.href = `../group-page/index.html?${params.toString()}`;
+  closeInviteModal();
+  openInviteLoading();
+
+  window.setTimeout(() => {
+    window.location.href = `../group-page/index.html?${params.toString()}`;
+  }, 1350);
 });
 
 inviteModal.addEventListener("click", (event) => {

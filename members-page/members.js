@@ -1,6 +1,7 @@
 const rail = document.getElementById("member-rail");
 const subtitle = document.getElementById("members-subtitle");
 const backLink = document.getElementById("back-link");
+const pageElement = document.querySelector(".page");
 const params = new URLSearchParams(window.location.search);
 
 const groupTitle = params.get("title") || "Pickleball";
@@ -73,6 +74,34 @@ const fallbackNames = [
   "Emerson",
   "Hayden"
 ];
+const groupPageColors = {
+  "Brunch club": "#dcebff",
+  "Crafting crew": "#92bad5",
+  "Running club": "#dff478",
+  "Book club": "#eef4ff",
+  "Art walk": "#c8f05a",
+  Pickleball: "#788ce3"
+};
+const paletteFallbacks = ["#dcebff", "#92bad5", "#dff478", "#eef4ff", "#c8f05a", "#788ce3", "#d8e4ff", "#edf7d4"];
+
+function hashString(value) {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function getGroupPageColor(title) {
+  if (groupPageColors[title]) {
+    return groupPageColors[title];
+  }
+
+  return paletteFallbacks[hashString(title) % paletteFallbacks.length];
+}
 
 function buildFallbackMembers(countText) {
   const total = Number.parseInt(countText, 10);
@@ -131,6 +160,9 @@ function renderMembers() {
 
   subtitle.textContent = groupTitle;
   backLink.href = `../group-page/index.html?${backParams.toString()}`;
+  if (pageElement) {
+    pageElement.style.setProperty("--group-page-bg", getGroupPageColor(groupTitle));
+  }
   rail.innerHTML = "";
 
   members.forEach((member) => {

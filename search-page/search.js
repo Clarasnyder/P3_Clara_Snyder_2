@@ -11,6 +11,7 @@ const groupSheetLink = document.getElementById("group-sheet-link");
 const inviteModal = document.getElementById("invite-modal");
 const inviteForm = document.getElementById("invite-form");
 const inviteInput = document.getElementById("invite-input");
+const inviteLoadingOverlay = document.getElementById("invite-loading-overlay");
 const requestOverlay = document.getElementById("request-overlay");
 const defaultCenter = [-83.9207, 35.9606];
 const styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
@@ -293,6 +294,15 @@ function openInviteModal() {
 function closeInviteModal() {
   inviteModal.classList.remove("is-open");
   inviteModal.setAttribute("aria-hidden", "true");
+}
+
+function openInviteLoading() {
+  if (!inviteLoadingOverlay) {
+    return;
+  }
+
+  inviteLoadingOverlay.classList.add("is-open");
+  inviteLoadingOverlay.setAttribute("aria-hidden", "false");
 }
 
 function showRequestOverlay(onComplete) {
@@ -578,7 +588,12 @@ inviteForm.addEventListener("submit", (event) => {
     centerLng: center.lng.toFixed(6)
   });
 
-  window.location.href = `../group-page/index.html?${params.toString()}`;
+  closeInviteModal();
+  openInviteLoading();
+
+  window.setTimeout(() => {
+    window.location.href = `../group-page/index.html?${params.toString()}`;
+  }, 1350);
 });
 
 groupSheet.addEventListener("click", (event) => {

@@ -45,7 +45,11 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--page-bg);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%),
+    radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%),
+    var(--group-page-bg, var(--page-bg));
 }
 
 .hero-banner {

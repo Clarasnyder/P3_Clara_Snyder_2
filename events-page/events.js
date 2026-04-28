@@ -1,8 +1,8 @@
 const backLink = document.getElementById("back-link");
-const eventsTitle = document.getElementById("events-title");
 const calendarMonth = document.getElementById("calendar-month");
 const calendarGrid = document.getElementById("calendar-grid");
 const eventList = document.getElementById("event-list");
+const pageElement = document.querySelector(".page");
 
 const params = new URLSearchParams(window.location.search);
 const rawTitle = params.get("title") || "Pickleball";
@@ -15,6 +15,34 @@ const rawCenterLng = params.get("centerLng") || "";
 const rawDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
+const groupPageColors = {
+  "Brunch club": "#dcebff",
+  "Crafting crew": "#92bad5",
+  "Running club": "#dff478",
+  "Book club": "#eef4ff",
+  "Art walk": "#c8f05a",
+  Pickleball: "#788ce3"
+};
+const paletteFallbacks = ["#dcebff", "#92bad5", "#dff478", "#eef4ff", "#c8f05a", "#788ce3", "#d8e4ff", "#edf7d4"];
+
+function hashString(value) {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function getGroupPageColor(title) {
+  if (groupPageColors[title]) {
+    return groupPageColors[title];
+  }
+
+  return paletteFallbacks[hashString(title) % paletteFallbacks.length];
+}
 
 const eventDirectory = {
   "Brunch club": {
@@ -270,8 +298,10 @@ function renderEvents(events) {
 
 const eventData = getEventData();
 
-eventsTitle.textContent = rawTitle;
 calendarMonth.textContent = eventData.month;
 backLink.href = `../group-page/index.html?${buildBackParams().toString()}`;
+if (pageElement) {
+  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(rawTitle));
+}
 renderCalendar(eventData.highlights);
 renderEvents(eventData.events);
