@@ -49,6 +49,21 @@ let activeGroup = null;
 let requestOverlayTimeout = null;
 let requestOverlayFadeTimeout = null;
 const pageParams = new URLSearchParams(window.location.search);
+const isEmbedded = pageParams.get("embedded") === "1";
+const shouldAutoFocus = pageParams.get("autofocus") === "1";
+
+function runSearchSelection(query) {
+  const selectedValue = toSearchLabel(query).trim();
+
+  if (!selectedValue) {
+    return;
+  }
+
+  searchInput.value = selectedValue;
+  dropdown.classList.add("is-hidden");
+  renderGroupMarkers(selectedValue);
+  searchInput.blur();
+}
 
 function readPendingTitles() {
   try {
@@ -305,7 +320,7 @@ function openInviteLoading() {
   inviteLoadingOverlay.setAttribute("aria-hidden", "false");
 }
 
-function showRequestOverlay(onComplete) {
+function showRequestOverlay(onFadeStart, onComplete) {
   if (!requestOverlay) {
     return;
   }
@@ -323,6 +338,10 @@ function showRequestOverlay(onComplete) {
   requestOverlay.setAttribute("aria-hidden", "false");
 
   requestOverlayTimeout = window.setTimeout(() => {
+    if (typeof onFadeStart === "function") {
+      onFadeStart();
+    }
+
     requestOverlay.classList.add("is-fading");
 
     requestOverlayFadeTimeout = window.setTimeout(() => {
@@ -513,12 +532,7 @@ function renderSuggestions(items) {
     meta.textContent = `${results.count} groups near you`;
     button.append(title, meta);
     button.addEventListener("click", () => {
-      const selectedValue = toSearchLabel(item);
-
-      searchInput.value = selectedValue;
-      dropdown.classList.add("is-hidden");
-      renderGroupMarkers(selectedValue);
-      searchInput.blur();
+      runSearchSelection(item);
     });
     suggestionsRoot.appendChild(button);
   });
@@ -561,9 +575,18 @@ groupSheetAction.addEventListener("click", () => {
 
   savePendingGroup(activeGroup);
   closeInviteModal();
-  showRequestOverlay(() => {
-    groupSheetAction.textContent = "Request sent!";
-  });
+  showRequestOverlay(
+    () => {
+      closeGroupSheet();
+    },
+    () => {
+      groupSheetAction.textContent = "Request sent!";
+
+      if (isEmbedded) {
+        window.parent.postMessage({ type: "pending-links-updated" }, "*");
+      }
+    }
+  );
 });
 
 groupSheetLink.addEventListener("click", openInviteModal);
@@ -688,9 +711,52 @@ function restoreSearchState() {
     center: restoreState.center,
     openGroupId: restoreState.groupId
   });
-  searchInput.blur();
+
+  if (!shouldAutoFocus) {
+    searchInput.blur();
+  }
 
   return true;
+}
+
+function setupEmbeddedMode() {
+  if (!isEmbedded) {
+    return;
+  }
+
+  document.body.classList.add("is-embedded");
+
+  const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+  const homeLink = navItems[0];
+
+  if (homeLink) {
+    homeLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.parent.postMessage({ type: "close-search-overlay" }, "*");
+    });
+  }
+
+  navItems.forEach((item, index) => {
+    if (index === 0) {
+      return;
+    }
+
+    item.addEventListener("click", (event) => {
+      event.preventDefault();
+      const href = item.getAttribute("href");
+
+      if (href) {
+        window.top.location.href = href;
+      }
+    });
+  });
+
+  window.parent.postMessage({ type: "embedded-search-ready" }, "*");
+  window.addEventListener("message", (event) => {
+    if (event.data?.type === "run-embedded-search") {
+      runSearchSelection(event.data.query || "");
+    }
+  });
 }
 
 map.once("load", () => {
@@ -700,8 +766,16 @@ map.once("load", () => {
   if (!restoreSearchState()) {
     updateMap(defaultCenter[1], defaultCenter[0]);
   }
+
+  if (shouldAutoFocus) {
+    window.setTimeout(() => {
+      searchInput.focus();
+    }, 120);
+  }
 });
 
 if (!getRestoreState()) {
   loadMapLocation();
 }
+
+setupEmbeddedMode();

@@ -1,48 +1,110 @@
-const inviteModal = document.getElementById("invite-modal");
-const inviteForm = document.getElementById("invite-form");
-const inviteInput = document.getElementById("invite-input");
-const inviteLoadingOverlay = document.getElementById("invite-loading-overlay");
-const requestOverlay = document.getElementById("request-overlay");
 const contentCards = document.querySelectorAll(".content-card");
-const requestButtons = document.querySelectorAll(".card-action-button");
-const inviteButtons = document.querySelectorAll(".card-action-link");
+const groupButtons = document.querySelectorAll(".card-action-button");
+const searchInput = document.getElementById("search-input");
+const dropdown = document.getElementById("search-dropdown");
+const suggestionsRoot = document.getElementById("search-suggestions");
+const pendingLinksShell = document.getElementById("pending-links-shell");
+const pendingLinksList = document.getElementById("pending-links-list");
+const scrollTail = document.getElementById("scroll-tail");
+const searchOverlay = document.getElementById("search-overlay");
+const searchOverlayBackdrop = document.getElementById("search-overlay-backdrop");
+const searchOverlayFrame = document.getElementById("search-overlay-frame");
+const profileLauncher = document.getElementById("profile-launcher");
+const messagesLauncher = document.getElementById("messages-launcher");
+const profileOverlay = document.getElementById("profile-overlay");
+const profileOverlayBackdrop = document.getElementById("profile-overlay-backdrop");
+const profileOverlayFrame = document.getElementById("profile-overlay-frame");
+const messagesOverlay = document.getElementById("messages-overlay");
+const messagesOverlayBackdrop = document.getElementById("messages-overlay-backdrop");
+const messagesOverlayFrame = document.getElementById("messages-overlay-frame");
+const page = document.querySelector(".page");
+let searchOverlayOpenedAt = 0;
+let embeddedSearchReady = false;
+let pendingEmbeddedSearch = "";
 const storageKey = "linkRequests";
+const defaultCenter = { lat: 35.9606, lng: -83.9207 };
+const seedSuggestions = [
+  "pickleball",
+  "hiking",
+  "running club",
+  "book club",
+  "brunch",
+  "coffee meetups",
+  "scrapbooking",
+  "pottery",
+  "movie nights",
+  "volunteering",
+  "study group",
+  "language exchange",
+  "networking",
+  "pet sitting",
+  "babysitting",
+  "housesitting",
+  "game night",
+  "tennis",
+  "badminton",
+  "pilates",
+  "yoga",
+  "cooking class",
+  "art walk",
+  "photography",
+  "live music",
+  "museum trip",
+  "dog walking",
+  "gardening",
+  "cycling",
+  "camping"
+];
+const descriptionParts = [
+  "Welcoming local meetups for",
+  "Relaxed weekly hangs built around",
+  "A nearby community that gets together for",
+  "Casual social gatherings focused on",
+  "Friendly meetups where people connect over"
+];
+const detailParts = [
+  "easy conversation and making new friends.",
+  "after-work plans and low-pressure group events.",
+  "beginner-friendly meetups around town.",
+  "recurring neighborhood sessions and spontaneous plans.",
+  "meeting up with people who share the same interest."
+];
 
-let activeInviteGroup = null;
-let requestOverlayTimeout = null;
-let requestOverlayFadeTimeout = null;
-
-function readPendingTitles() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
-    const groups = Array.isArray(stored) ? stored : [];
-
-    return new Set(
-      groups
-        .filter((entry) => entry?.source === "request-link" && entry?.title)
-        .map((entry) => entry.title)
-    );
-  } catch (error) {
-    return new Set();
-  }
+function getGroupPagePath() {
+  return window.location.pathname.includes("/homepage/")
+    ? "../group-page/index.html"
+    : "./group-page/index.html";
 }
 
-function savePendingGroup(group) {
-  try {
-    const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
-    const groups = Array.isArray(stored) ? stored : [];
-    const nextGroups = groups.filter((entry) => entry.title !== group.title);
+function getSearchPagePath() {
+  return window.location.pathname.includes("/homepage/")
+    ? "../search-page/index.html"
+    : "./search-page/index.html";
+}
 
-    nextGroups.unshift({
-      title: group.title,
-      status: "pending",
-      source: "request-link"
-    });
+function getMessagesPagePath() {
+  return window.location.pathname.includes("/homepage/")
+    ? "../messages-page/index.html"
+    : "./messages-page/index.html";
+}
 
-    localStorage.setItem(storageKey, JSON.stringify(nextGroups));
-  } catch (error) {
-    console.error(error);
+function getProfilePagePath() {
+  return window.location.pathname.includes("/homepage/")
+    ? "../my-groups-page/index.html"
+    : "./my-groups-page/index.html";
+}
+
+function buildEmbeddedSearchUrl(query = "") {
+  const params = new URLSearchParams({
+    embedded: "1",
+    autofocus: "1"
+  });
+
+  if (query.trim()) {
+    params.set("search", query.trim());
   }
+
+  return `${getSearchPagePath()}?${params.toString()}`;
 }
 
 function getCardGroup(card) {
@@ -51,6 +113,408 @@ function getCardGroup(card) {
     members: card.dataset.groupMembers,
     description: card.dataset.groupDescription
   };
+}
+
+function sentenceCase(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function toSearchLabel(value) {
+  return value.replace(/^Search for "|"$|^Search for /g, "");
+}
+
+function hashString(value) {
+  let hash = 2166136261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function seededRandom(seed) {
+  let state = seed >>> 0;
+
+  return () => {
+    state += 0x6d2b79f5;
+    let value = state;
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function buildGroupResults(query, center = defaultCenter) {
+  const cleanedQuery = toSearchLabel(query).trim();
+
+  if (!cleanedQuery) {
+    return {
+      cleanedQuery,
+      count: 0,
+      groups: []
+    };
+  }
+
+  const random = seededRandom(
+    hashString(`${cleanedQuery}-${center.lat.toFixed(3)}-${center.lng.toFixed(3)}`)
+  );
+  const markerCount = 5 + Math.floor(random() * 3);
+  const groups = [];
+
+  for (let index = 0; index < markerCount; index += 1) {
+    const memberCount = 12 + Math.floor(random() * 31);
+    const intro = descriptionParts[Math.floor(random() * descriptionParts.length)];
+    const detail = detailParts[Math.floor(random() * detailParts.length)];
+
+    groups.push({
+      id: `${cleanedQuery}-${index}`,
+      label: cleanedQuery,
+      members: memberCount,
+      description: `${intro} ${cleanedQuery.toLowerCase()}, with ${detail}`
+    });
+  }
+
+  return {
+    cleanedQuery,
+    count: markerCount,
+    groups
+  };
+}
+
+function buildSuggestions(query) {
+  const trimmed = query.trim().toLowerCase();
+
+  if (!trimmed) {
+    return [];
+  }
+
+  const startsWith = seedSuggestions.filter((item) => item.startsWith(trimmed));
+  const includes = seedSuggestions.filter(
+    (item) => !item.startsWith(trimmed) && item.includes(trimmed)
+  );
+  const related = [
+    `${trimmed} group`,
+    `${trimmed} near me`,
+    `${trimmed} events`,
+    `${trimmed} club`,
+    `${trimmed} friends`
+  ];
+
+  const merged = [...startsWith, ...includes, ...related]
+    .map((item) => sentenceCase(item))
+    .filter((item, index, array) => array.indexOf(item) === index);
+
+  const exactMatch = startsWith.length > 0 || includes.length > 0;
+  const limit = trimmed.length >= 7 ? 2 : trimmed.length >= 4 ? 3 : 4;
+  const sliced = merged.slice(0, limit);
+
+  if (!exactMatch && sliced.length < limit) {
+    sliced.push(`Search for "${sentenceCase(trimmed)}"`);
+  }
+
+  return sliced.slice(0, 4);
+}
+
+function resetPendingGroupsOnRefresh() {
+  const navigationEntries = performance.getEntriesByType("navigation");
+  const navigationType = navigationEntries[0]?.type;
+
+  if (navigationType === "reload") {
+    localStorage.removeItem(storageKey);
+  }
+}
+
+function readPendingGroups() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
+    if (!Array.isArray(stored)) {
+      return [];
+    }
+
+    return stored.filter((group) => group?.source === "request-link" && group?.title);
+  } catch (error) {
+    return [];
+  }
+}
+
+function renderPendingGroups() {
+  if (!pendingLinksShell || !pendingLinksList || !scrollTail) {
+    return;
+  }
+
+  const groups = readPendingGroups();
+  pendingLinksList.innerHTML = "";
+
+  if (groups.length === 0) {
+    pendingLinksShell.classList.add("is-hidden");
+    scrollTail.style.height = "214%";
+    return;
+  }
+
+  pendingLinksShell.classList.remove("is-hidden");
+  scrollTail.style.height = `${214 + groups.length * 24}%`;
+
+  groups.forEach((group) => {
+    const item = document.createElement("article");
+    const title = document.createElement("p");
+    const status = document.createElement("span");
+
+    item.className = "pending-link-item";
+    title.className = "pending-link-title";
+    status.className = "pending-link-status";
+
+    title.textContent = group.title;
+    status.textContent = "Pending";
+
+    item.append(title, status);
+    pendingLinksList.appendChild(item);
+  });
+}
+
+function renderSuggestions(items) {
+  if (!suggestionsRoot) {
+    return;
+  }
+
+  suggestionsRoot.innerHTML = "";
+  suggestionsRoot.style.gridTemplateRows = `repeat(${items.length}, minmax(0, 1fr))`;
+
+  items.forEach((item) => {
+    const results = buildGroupResults(item);
+    const button = document.createElement("button");
+    const title = document.createElement("span");
+    const meta = document.createElement("span");
+
+    button.type = "button";
+    button.className = "suggestion-item";
+    button.setAttribute("role", "option");
+    title.className = "suggestion-title";
+    title.textContent = item;
+    meta.className = "suggestion-meta";
+    meta.textContent = `${results.count} groups near you`;
+    button.append(title, meta);
+    button.addEventListener("click", () => {
+      const selectedValue = toSearchLabel(item);
+
+      if (searchInput) {
+        searchInput.value = selectedValue;
+      }
+
+      if (dropdown) {
+        dropdown.classList.add("is-hidden");
+      }
+      suggestionsRoot.innerHTML = "";
+      sendEmbeddedSearch(selectedValue);
+      searchInput?.blur();
+    });
+
+    suggestionsRoot.appendChild(button);
+  });
+}
+
+function openSearchOverlay(query = "") {
+  if (!searchOverlay || !searchOverlayFrame) {
+    return;
+  }
+
+  const nextUrl = buildEmbeddedSearchUrl(query);
+  const shouldRefreshFrame = !searchOverlayFrame.dataset.src;
+
+  if (shouldRefreshFrame && searchOverlayFrame.dataset.src !== nextUrl) {
+    embeddedSearchReady = false;
+    searchOverlayFrame.src = nextUrl;
+    searchOverlayFrame.dataset.src = nextUrl;
+  }
+
+  searchOverlayOpenedAt = Date.now();
+  searchOverlay.classList.add("is-open");
+  searchOverlay.setAttribute("aria-hidden", "false");
+  page?.classList.add("is-search-open");
+}
+
+function openPanelOverlay(kind) {
+  const isMessages = kind === "messages";
+  const overlay = isMessages ? messagesOverlay : profileOverlay;
+  const frame = isMessages ? messagesOverlayFrame : profileOverlayFrame;
+  const src = `${isMessages ? getMessagesPagePath() : getProfilePagePath()}?embedded=1`;
+
+  if (!overlay || !frame) {
+    return;
+  }
+
+  if (frame.dataset.src !== src) {
+    frame.src = src;
+    frame.dataset.src = src;
+  }
+
+  overlay.classList.add("is-open");
+  overlay.setAttribute("aria-hidden", "false");
+}
+
+function closePanelOverlay(kind) {
+  const overlay = kind === "messages" ? messagesOverlay : profileOverlay;
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.remove("is-open");
+  overlay.setAttribute("aria-hidden", "true");
+}
+
+function sendEmbeddedSearch(query) {
+  if (!searchOverlayFrame) {
+    return;
+  }
+
+  openSearchOverlay();
+  pendingEmbeddedSearch = query.trim();
+
+  if (!embeddedSearchReady || !searchOverlayFrame.contentWindow) {
+    return;
+  }
+
+  searchOverlayFrame.contentWindow.postMessage(
+    {
+      type: "run-embedded-search",
+      query: pendingEmbeddedSearch
+    },
+    "*"
+  );
+  pendingEmbeddedSearch = "";
+}
+
+function closeSearchOverlay() {
+  if (!searchOverlay) {
+    return;
+  }
+
+  searchOverlay.classList.remove("is-open");
+  searchOverlay.setAttribute("aria-hidden", "true");
+  page?.classList.remove("is-search-open");
+  embeddedSearchReady = false;
+  pendingEmbeddedSearch = "";
+
+  if (searchOverlayFrame) {
+    const resetUrl = buildEmbeddedSearchUrl();
+    searchOverlayFrame.src = resetUrl;
+    searchOverlayFrame.dataset.src = resetUrl;
+  }
+
+  if (searchInput) {
+    searchInput.value = "";
+  }
+  dropdown?.classList.add("is-hidden");
+  suggestionsRoot.innerHTML = "";
+  searchInput?.blur();
+}
+
+function setupHeaderSearch() {
+  if (!searchInput || !dropdown || !suggestionsRoot) {
+    return;
+  }
+
+  searchInput.addEventListener("focus", () => {
+    openSearchOverlay();
+
+    const suggestions = buildSuggestions(searchInput.value);
+
+    if (suggestions.length) {
+      renderSuggestions(suggestions);
+      dropdown.classList.remove("is-hidden");
+    }
+  });
+
+  searchInput.addEventListener("click", () => {
+    openSearchOverlay();
+  });
+
+  searchInput.addEventListener("input", () => {
+    const suggestions = buildSuggestions(searchInput.value);
+
+    if (suggestions.length === 0) {
+      dropdown.classList.add("is-hidden");
+      suggestionsRoot.innerHTML = "";
+      return;
+    }
+
+    renderSuggestions(suggestions);
+    dropdown.classList.remove("is-hidden");
+  });
+
+  searchOverlayBackdrop?.addEventListener("click", () => {
+    if (Date.now() - searchOverlayOpenedAt < 220) {
+      return;
+    }
+
+    closeSearchOverlay();
+  });
+
+  profileLauncher?.addEventListener("click", (event) => {
+    event.preventDefault();
+    openPanelOverlay("profile");
+  });
+
+  messagesLauncher?.addEventListener("click", (event) => {
+    event.preventDefault();
+    openPanelOverlay("messages");
+  });
+
+  profileOverlayBackdrop?.addEventListener("click", () => {
+    closePanelOverlay("profile");
+  });
+
+  messagesOverlayBackdrop?.addEventListener("click", () => {
+    closePanelOverlay("messages");
+  });
+
+  window.addEventListener("message", (event) => {
+    if (event.data?.type === "close-search-overlay") {
+      closeSearchOverlay();
+      return;
+    }
+
+    if (event.data?.type === "pending-links-updated") {
+      renderPendingGroups();
+      return;
+    }
+
+    if (event.data?.type === "close-panel-overlay") {
+      closePanelOverlay(event.data.panel);
+      return;
+    }
+
+    if (event.data?.type === "open-panel-overlay") {
+      openPanelOverlay(event.data.panel);
+      return;
+    }
+
+    if (event.data?.type === "embedded-search-ready") {
+      embeddedSearchReady = true;
+
+      if (pendingEmbeddedSearch && searchOverlayFrame?.contentWindow) {
+        searchOverlayFrame.contentWindow.postMessage(
+          {
+            type: "run-embedded-search",
+            query: pendingEmbeddedSearch
+          },
+          "*"
+        );
+        pendingEmbeddedSearch = "";
+      }
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const searchArea = document.querySelector(".search-area");
+
+    if (searchArea && !searchArea.contains(event.target)) {
+      dropdown.classList.add("is-hidden");
+    }
+  });
 }
 
 function renderCardTitles() {
@@ -79,15 +543,23 @@ function renderCardPhotoDescriptions() {
 
     const descriptionPanel = document.createElement("div");
     const descriptionText = document.createElement("p");
+    const dots = document.createElement("div");
+    const imageDot = document.createElement("span");
+    const descriptionDot = document.createElement("span");
 
     photoShell.classList.add("card-photo-shell-swipeable");
     descriptionPanel.className = "card-photo-description";
     descriptionPanel.setAttribute("aria-hidden", "true");
     descriptionText.className = "card-photo-description-text";
     descriptionText.textContent = groupDescription;
+    dots.className = "card-photo-dots";
+    dots.setAttribute("aria-hidden", "true");
+    imageDot.className = "card-photo-dot is-active";
+    descriptionDot.className = "card-photo-dot";
 
+    dots.append(imageDot, descriptionDot);
     descriptionPanel.appendChild(descriptionText);
-    photoShell.appendChild(descriptionPanel);
+    photoShell.append(descriptionPanel, dots);
   });
 }
 
@@ -103,6 +575,12 @@ function setupCardPhotoSwipes() {
 
     const updateDescriptionState = (isVisible) => {
       photoShell.classList.toggle("is-description-visible", isVisible);
+      const dots = photoShell.querySelectorAll(".card-photo-dot");
+
+      if (dots.length === 2) {
+        dots[0].classList.toggle("is-active", !isVisible);
+        dots[1].classList.toggle("is-active", isVisible);
+      }
     };
 
     const handleSwipeStart = (pointX, pointY) => {
@@ -118,7 +596,7 @@ function setupCardPhotoSwipes() {
         return;
       }
 
-      if (deltaX > 0) {
+      if (deltaX < 0) {
         updateDescriptionState(true);
         return;
       }
@@ -196,131 +674,34 @@ function setupCardPhotoSwipes() {
   });
 }
 
-function syncRequestButtons() {
-  const pendingTitles = readPendingTitles();
+function setupGroupButtons() {
+  const groupPagePath = getGroupPagePath();
 
-  requestButtons.forEach((button) => {
-    const card = button.closest(".content-card");
-    const groupTitle = card?.dataset.groupTitle;
-    const isPending = Boolean(groupTitle && pendingTitles.has(groupTitle));
+  groupButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const card = button.closest(".content-card");
 
-    button.textContent = isPending ? "Request sent!" : "Request to link";
-  });
-}
-
-function openInviteModal(group) {
-  activeInviteGroup = group;
-  inviteInput.value = "";
-  inviteModal.classList.add("is-open");
-  inviteModal.setAttribute("aria-hidden", "false");
-  window.setTimeout(() => inviteInput.focus(), 20);
-}
-
-function closeInviteModal() {
-  inviteModal.classList.remove("is-open");
-  inviteModal.setAttribute("aria-hidden", "true");
-  activeInviteGroup = null;
-}
-
-function openInviteLoading() {
-  if (!inviteLoadingOverlay) {
-    return;
-  }
-
-  inviteLoadingOverlay.classList.add("is-open");
-  inviteLoadingOverlay.setAttribute("aria-hidden", "false");
-}
-
-function showRequestOverlay(onComplete) {
-  if (!requestOverlay) {
-    return;
-  }
-
-  if (requestOverlayTimeout) {
-    window.clearTimeout(requestOverlayTimeout);
-  }
-
-  if (requestOverlayFadeTimeout) {
-    window.clearTimeout(requestOverlayFadeTimeout);
-  }
-
-  requestOverlay.classList.remove("is-fading");
-  requestOverlay.classList.add("is-open");
-  requestOverlay.setAttribute("aria-hidden", "false");
-
-  requestOverlayTimeout = window.setTimeout(() => {
-    requestOverlay.classList.add("is-fading");
-
-    requestOverlayFadeTimeout = window.setTimeout(() => {
-      requestOverlay.classList.remove("is-open", "is-fading");
-      requestOverlay.setAttribute("aria-hidden", "true");
-      if (typeof onComplete === "function") {
-        onComplete();
+      if (!card) {
+        return;
       }
-    }, 550);
-  }, 1600);
+
+      const group = getCardGroup(card);
+      const params = new URLSearchParams({
+        title: group.title,
+        members: group.members,
+        description: group.description,
+        back: "home"
+      });
+
+      window.location.href = `${groupPagePath}?${params.toString()}`;
+    });
+  });
 }
 
-requestButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const card = button.closest(".content-card");
-
-    if (!card) {
-      return;
-    }
-
-    savePendingGroup(getCardGroup(card));
-    showRequestOverlay(syncRequestButtons);
-  });
-});
-
-inviteButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const card = button.closest(".content-card");
-
-    if (!card) {
-      return;
-    }
-
-    openInviteModal(getCardGroup(card));
-  });
-});
-
-inviteForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  if (!activeInviteGroup || !inviteInput.value.trim()) {
-    return;
-  }
-
-  const params = new URLSearchParams({
-    title: activeInviteGroup.title,
-    members: activeInviteGroup.members,
-    description: activeInviteGroup.description,
-    back: "home"
-  });
-
-  closeInviteModal();
-  openInviteLoading();
-
-  window.setTimeout(() => {
-    window.location.href = `../group-page/index.html?${params.toString()}`;
-  }, 1350);
-});
-
-inviteModal.addEventListener("click", (event) => {
-  if (event.target === inviteModal) {
-    closeInviteModal();
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && inviteModal.classList.contains("is-open")) {
-    closeInviteModal();
-  }
-});
-
-syncRequestButtons();
 renderCardTitles();
 renderCardPhotoDescriptions();
 setupCardPhotoSwipes();
+setupGroupButtons();
+resetPendingGroupsOnRefresh();
+renderPendingGroups();
+setupHeaderSearch();

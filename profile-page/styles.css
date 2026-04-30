@@ -44,14 +44,52 @@ body {
   position: absolute;
   inset: 0 0 auto 0;
   z-index: 1;
-  height: 17.3913%;
-  background: var(--hero-bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  height: 88px;
+  padding: 28px 24px 0;
+  background: transparent;
+}
+
+.hero-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.hero-close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.hero-close-button:hover .hero-logo {
+  transform: scale(1.06);
+}
+
+.hero-close-button:active {
+  opacity: 0.86;
+  transform: scale(0.94);
+}
+
+.hero-close-button:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.35);
+  outline-offset: 2px;
 }
 
 .profile-content {
   position: absolute;
-  inset: 17.3913% 0 11.5% 0;
-  padding: 28px 24px 24px;
+  inset: 0 0 11.5% 0;
+  padding: 84px 24px 24px;
   overflow-y: auto;
 }
 

@@ -5,47 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Feed Page</title>
     <link rel="stylesheet" href="./homepage/styles.css" />
+    <script src="./homepage/homepage.js" defer></script>
   </head>
   <body>
     <div class="phone-viewport">
       <main class="page" data-node-id="2:3" data-name="Feed page">
-        <header class="hero-banner" data-node-id="120:334"></header>
+        <header class="hero-banner" data-node-id="120:334">
+          <img
+            class="hero-logo"
+            src="./assets/icons/link.svg"
+            alt="Link"
+            aria-hidden="true"
+          />
+          <div class="search-area">
+            <div class="search-pill">
+              <input
+                class="search-input"
+                id="search-input"
+                type="text"
+                placeholder="Search"
+                aria-label="Search"
+                autocomplete="off"
+              />
+            </div>
+            <div class="search-dropdown is-hidden" id="search-dropdown" aria-live="polite">
+              <div class="search-suggestions" id="search-suggestions" role="listbox"></div>
+            </div>
+          </div>
+        </header>
 
         <section class="scroll-region" aria-label="Scrollable feed content">
-          <section class="content-card card-one" data-node-id="120:337">
+          <section
+            class="content-card card-one"
+            data-node-id="120:337"
+            data-group-title="Brunch club"
+            data-group-members="24"
+            data-group-description="Welcoming local meetups for brunch plans, easy conversation, and trying new spots around Knoxville."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="./assets/photos/c9fddbe6153ba83bcd9c051fca39e911.jpg"
+                alt="Brunch spread on a table"
+              />
+            </div>
             <div class="card-actions">
-              <button class="card-action-button" type="button">Request to link</button>
-              <button class="card-action-link" type="button">Enter invite code</button>
+              <button class="card-action-button" type="button">Go to group</button>
             </div>
           </section>
-          <section class="content-card card-two" data-node-id="146:482">
+          <section
+            class="content-card card-two"
+            data-node-id="146:482"
+            data-group-title="Crafting crew"
+            data-group-members="19"
+            data-group-description="A nearby community that gets together for crafting nights, shared supplies, and relaxed weekend projects."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="./assets/photos/e68c81992aa09dce515b5a73f77d17b5.jpg"
+                alt="Friends crafting together around a table"
+              />
+            </div>
             <div class="card-actions">
-              <button class="card-action-button" type="button">Request to link</button>
-              <button class="card-action-link" type="button">Enter invite code</button>
+              <button class="card-action-button" type="button">Go to group</button>
             </div>
           </section>
-          <section class="content-card card-three" data-node-id="146:493">
-            <div class="card-actions">
-              <button class="card-action-button" type="button">Request to link</button>
-              <button class="card-action-link" type="button">Enter invite code</button>
+          <section
+            class="content-card card-three"
+            data-node-id="146:493"
+            data-group-title="Pickleball"
+            data-group-members="27"
+            data-group-description="Beginner-friendly meetups around town with easy games, open courts, and low-pressure social play."
+          >
+            <div class="card-photo-shell">
+              <img
+                class="card-photo"
+                src="./assets/photos/13376d9329100fad84a023e5ff6c623f.jpg"
+                alt="Two people playing pickleball on a court"
+              />
             </div>
-          </section>
-          <section class="content-card card-four">
             <div class="card-actions">
-              <button class="card-action-button" type="button">Request to link</button>
-              <button class="card-action-link" type="button">Enter invite code</button>
-            </div>
-          </section>
-          <section class="content-card card-five">
-            <div class="card-actions">
-              <button class="card-action-button" type="button">Request to link</button>
-              <button class="card-action-link" type="button">Enter invite code</button>
-            </div>
-          </section>
-          <section class="content-card card-six">
-            <div class="card-actions">
-              <button class="card-action-button" type="button">Request to link</button>
-              <button class="card-action-link" type="button">Enter invite code</button>
+              <button class="card-action-button" type="button">Go to group</button>
             </div>
           </section>
         </section>

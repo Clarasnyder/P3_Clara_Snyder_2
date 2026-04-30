@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Messages</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="messages.js" defer></script>
   </head>
   <body>
     <div class="phone-viewport">
       <main class="page">
         <header class="hero-banner">
-          <img
-            class="hero-logo"
-            src="../assets/icons/link.svg"
-            alt="Link"
-            aria-hidden="true"
-          />
+          <button class="hero-close-button" id="messages-close-button" type="button" aria-label="Close messages">
+            <img
+              class="hero-logo"
+              src="../assets/icons/messages.svg"
+              alt=""
+              aria-hidden="true"
+            />
+          </button>
         </header>
 
         <section class="messages-content" aria-label="Messages content">
@@ -114,21 +117,6 @@
             </a>
           </section>
         </section>
-
-        <nav class="bottom-nav" aria-label="Bottom navigation">
-          <a class="nav-item" href="../homepage/index.html" aria-label="Home">
-            <img class="nav-icon" src="../assets/icons/home.svg" alt="" aria-hidden="true" />
-          </a>
-          <a class="nav-item nav-item-active" href="../messages-page/index.html" aria-label="Messages" aria-current="page">
-            <img class="nav-icon" src="../assets/icons/messages.svg" alt="" aria-hidden="true" />
-          </a>
-          <a class="nav-item" href="../search-page/index.html" aria-label="Search">
-            <img class="nav-icon" src="../assets/icons/search2.svg" alt="" aria-hidden="true" />
-          </a>
-          <a class="nav-item" href="../my-groups-page/index.html" aria-label="Profile">
-            <img class="nav-icon" src="../assets/icons/person.svg" alt="" aria-hidden="true" />
-          </a>
-        </nav>
       </main>
     </div>
   </body>
