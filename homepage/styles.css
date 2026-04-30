@@ -338,10 +338,14 @@ body {
   width: 78%;
   height: 45%;
   overflow: hidden;
+  overflow: clip;
   border: 1px solid rgba(23, 36, 63, 0.14);
   border-radius: 22px;
   background: rgba(244, 248, 255, 0.68);
   box-shadow: 0 10px 22px rgba(23, 36, 63, 0.12);
+  clip-path: inset(0 round 22px);
+  contain: paint;
+  isolation: isolate;
   transform: translateX(-50%);
 }
 
@@ -364,8 +368,10 @@ body {
   align-items: flex-end;
   padding: 18px 16px;
   background: linear-gradient(135deg, rgba(23, 36, 63, 0.9) 0%, rgba(100, 120, 255, 0.84) 100%);
-  transform: translateX(104%);
-  transition: transform 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0s linear 0.22s;
 }
 
 .card-photo-description-text {
@@ -405,7 +411,10 @@ body {
 }
 
 .card-photo-shell.is-description-visible .card-photo-description {
-  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
 }
 
 .card-actions {
