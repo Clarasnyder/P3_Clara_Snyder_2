@@ -46,24 +46,55 @@
           <section class="group-actions" aria-label="Group sections">
             <button class="group-card" id="members-button" type="button">Members</button>
             <button class="group-card" id="events-button" type="button">Events</button>
-            <button class="group-card" type="button">Event Check-in</button>
+            <button class="group-card" id="checkin-button" type="button">Event Check-in</button>
           </section>
         </section>
 
-        <nav class="bottom-nav" aria-label="Bottom navigation">
-          <a class="nav-item" href="../homepage/index.html" aria-label="Home">
-            <img class="nav-icon" src="../assets/icons/home.svg" alt="" aria-hidden="true" />
-          </a>
-          <a class="nav-item" href="../messages-page/index.html" aria-label="Messages">
-            <img class="nav-icon" src="../assets/icons/messages.svg" alt="" aria-hidden="true" />
-          </a>
-          <a class="nav-item nav-item-active" href="../search-page/index.html" aria-label="Search" aria-current="page">
-            <img class="nav-icon" src="../assets/icons/search2.svg" alt="" aria-hidden="true" />
-          </a>
-          <a class="nav-item" href="../my-groups-page/index.html" aria-label="Profile">
-            <img class="nav-icon" src="../assets/icons/person.svg" alt="" aria-hidden="true" />
-          </a>
-        </nav>
+        <section class="checkin-overlay" id="checkin-overlay" aria-hidden="true">
+          <div class="checkin-panel" role="dialog" aria-labelledby="checkin-title">
+            <div class="checkin-task-view" id="checkin-task-view">
+              <p class="checkin-kicker">Event Check-in</p>
+              <h2 class="checkin-title" id="checkin-title">Meet 2 new people</h2>
+              <p class="checkin-task" id="checkin-task">
+                Before you check in, introduce yourself to two people you have not met yet.
+                Ask each what brought them to this group, then find one thing you have in common.
+              </p>
+              <div class="checkin-actions">
+                <button class="checkin-primary" id="checkin-complete-button" type="button">Add proof!</button>
+                <button class="checkin-secondary" id="checkin-new-task-button" type="button">New task</button>
+              </div>
+            </div>
+
+            <div class="checkin-camera-view" id="checkin-camera-view" aria-hidden="true">
+              <div class="camera-header">
+                <div>
+                  <p class="checkin-kicker">Proof camera</p>
+                  <h2 class="camera-title">Check-in proof</h2>
+                </div>
+                <button class="camera-back-button" id="camera-back-button" type="button">Task</button>
+              </div>
+
+              <div class="camera-frame" id="camera-frame" aria-label="Camera preview">
+                <span class="camera-live">Live</span>
+                <span class="camera-corner camera-corner-top-left"></span>
+                <span class="camera-corner camera-corner-top-right"></span>
+                <span class="camera-corner camera-corner-bottom-left"></span>
+                <span class="camera-corner camera-corner-bottom-right"></span>
+                <video class="camera-video" id="camera-video" autoplay playsinline muted></video>
+                <canvas class="camera-canvas" id="camera-canvas" hidden></canvas>
+                <p class="camera-error" id="camera-error"></p>
+                <p class="camera-status" id="camera-status">Line up your proof</p>
+              </div>
+
+              <div class="camera-actions" id="camera-actions">
+                <button class="camera-shutter" id="camera-shutter-button" type="button" aria-label="Take photo"></button>
+                <button class="checkin-primary camera-submit" id="camera-submit-button" type="button" disabled>
+                  Submit check-in
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   </body>

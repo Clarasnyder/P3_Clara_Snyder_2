@@ -11,6 +11,7 @@ const groupSearch = params.get("search") || "";
 const groupId = params.get("groupId") || "";
 const groupCenterLat = params.get("centerLat") || "";
 const groupCenterLng = params.get("centerLng") || "";
+const activeProfile = params.get("profile") || "";
 const groupDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
@@ -72,7 +73,47 @@ const fallbackNames = [
   "Rowan",
   "Sage",
   "Emerson",
-  "Hayden"
+  "Hayden",
+  "Amelia",
+  "Ezra",
+  "Mina",
+  "Kai",
+  "Tessa",
+  "Owen",
+  "Priya",
+  "Miles",
+  "Elena",
+  "Drew",
+  "Maren",
+  "Iris",
+  "Dylan",
+  "Cora",
+  "Finn",
+  "Zara",
+  "Mateo",
+  "June",
+  "Ellis",
+  "Wren",
+  "Jonah",
+  "Mika",
+  "Lila",
+  "Arlo",
+  "Nora",
+  "Theo",
+  "Selah",
+  "Remy",
+  "Talia",
+  "Micah",
+  "Maeve",
+  "Rory",
+  "Sienna",
+  "Caleb",
+  "Naomi",
+  "Julian",
+  "Phoebe",
+  "Cameron",
+  "Anika",
+  "Bennett"
 ];
 const groupPageColors = {
   "Brunch club": "#dcebff",
@@ -120,9 +161,10 @@ function getGroupPageColor(title) {
 function buildFallbackMembers(countText) {
   const total = Number.parseInt(countText, 10);
   const fallbackTotal = Number.isFinite(total) ? Math.max(total, 5) : 5;
+  const names = fallbackNames.slice(0, fallbackTotal);
 
-  return Array.from({ length: fallbackTotal }, (_, index) => ({
-    name: fallbackNames[index % fallbackNames.length],
+  return names.map((name, index) => ({
+    name,
     age: 22 + (index % 12)
   }));
 }
@@ -136,15 +178,24 @@ function buildMemberList(title, countText) {
     return buildFallbackMembers(targetCount);
   }
 
-  return Array.from({ length: targetCount }, (_, index) => {
-    const seedMember = seedMembers[index % seedMembers.length];
-    const cycle = Math.floor(index / seedMembers.length);
+  const members = seedMembers.slice(0, targetCount);
+  const usedNames = new Set(members.map((member) => member.name));
+  const availableNames = fallbackNames.filter((name) => !usedNames.has(name));
 
-    return {
-      name: cycle === 0 ? seedMember.name : `${seedMember.name} ${cycle + 1}`,
-      age: seedMember.age + (cycle % 3)
-    };
+  availableNames.some((name, index) => {
+    if (members.length >= targetCount) {
+      return true;
+    }
+
+    members.push({
+      name,
+      age: 22 + ((members.length + index) % 12)
+    });
+
+    return false;
   });
+
+  return members;
 }
 
 function getInitials(name) {
@@ -176,6 +227,20 @@ function closeOtherCards(activeCard) {
   });
 }
 
+function flipMemberCard(card, action, behavior = "smooth") {
+  closeOtherCards(card);
+  card.classList.add("is-flipped");
+  action.setAttribute("aria-expanded", "true");
+  card.scrollIntoView({ behavior, block: "nearest", inline: "center" });
+  updateCenteredCard();
+}
+
+function unflipMemberCard(card, action) {
+  card.classList.remove("is-flipped");
+  action.setAttribute("aria-expanded", "false");
+  updateCenteredCard();
+}
+
 function renderMembers() {
   const members = buildMemberList(groupTitle, groupMembers);
   const backParams = new URLSearchParams({
@@ -201,7 +266,7 @@ function renderMembers() {
     backParams.set("centerLng", groupCenterLng);
   }
 
-  subtitle.textContent = `${groupMembers} members`;
+  subtitle.textContent = `${members.length} members`;
   backLink.href = `../group-page/index.html?${backParams.toString()}`;
   if (pageElement) {
     pageElement.style.setProperty("--group-page-bg", getGroupPageColor(groupTitle));
@@ -260,15 +325,24 @@ function renderMembers() {
     });
 
     action.addEventListener("click", () => {
-      closeOtherCards(card);
-      card.classList.add("is-flipped");
-      action.setAttribute("aria-expanded", "true");
-      card.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-      updateCenteredCard();
+      flipMemberCard(card, action);
     });
 
-    closeAction.addEventListener("click", () => {
+    cardBack.addEventListener("click", () => {
+      unflipMemberCard(card, action);
+    });
+
+    closeAction.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      const returnParams = new URLSearchParams(window.location.search);
+      const returnUrl = new URL(window.location.href);
       const messageParams = new URLSearchParams({ title: member.name });
+
+      returnParams.set("profile", member.name);
+      returnUrl.search = returnParams.toString();
+      messageParams.set("returnTo", `../members-page/index.html?${returnParams.toString()}`);
+      window.history.replaceState(null, "", returnUrl.toString());
       window.location.href = `../group-text-page/index.html?${messageParams.toString()}`;
     });
 
@@ -277,6 +351,12 @@ function renderMembers() {
     cardInner.append(cardFront, cardBack);
     card.append(cardInner);
     rail.appendChild(card);
+
+    if (activeProfile === member.name) {
+      window.requestAnimationFrame(() => {
+        flipMemberCard(card, action, "auto");
+      });
+    }
   });
 }
 

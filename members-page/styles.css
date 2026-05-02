@@ -233,6 +233,10 @@ body {
   transform: rotateY(180deg);
 }
 
+.member-card.is-flipped .member-card-back {
+  cursor: pointer;
+}
+
 .member-card:nth-child(3n + 2) .member-card-face {
   background: rgba(223, 244, 120, 0.36);
 }

@@ -611,10 +611,18 @@ inviteForm.addEventListener("submit", (event) => {
     centerLng: center.lng.toFixed(6)
   });
 
+  if (isEmbedded) {
+    params.set("embedded", "1");
+  }
+
   closeInviteModal();
   openInviteLoading();
 
   window.setTimeout(() => {
+    if (isEmbedded) {
+      window.parent.postMessage({ type: "expand-search-overlay" }, "*");
+    }
+
     window.location.href = `../group-page/index.html?${params.toString()}`;
   }, 1350);
 });

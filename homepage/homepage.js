@@ -320,6 +320,9 @@ function openSearchOverlay(query = "") {
     return;
   }
 
+  searchOverlay.classList.remove("is-fullscreen");
+  page?.classList.remove("is-search-fullscreen");
+
   const nextUrl = buildEmbeddedSearchUrl(query);
   const shouldRefreshFrame = !searchOverlayFrame.dataset.src;
 
@@ -333,6 +336,28 @@ function openSearchOverlay(query = "") {
   searchOverlay.classList.add("is-open");
   searchOverlay.setAttribute("aria-hidden", "false");
   page?.classList.add("is-search-open");
+}
+
+function expandSearchOverlay() {
+  if (!searchOverlay) {
+    return;
+  }
+
+  searchOverlay.classList.add("is-open", "is-fullscreen");
+  searchOverlay.setAttribute("aria-hidden", "false");
+  page?.classList.add("is-search-open", "is-search-fullscreen");
+}
+
+function collapseSearchOverlay() {
+  if (!searchOverlay) {
+    return;
+  }
+
+  searchOverlay.classList.add("is-open");
+  searchOverlay.classList.remove("is-fullscreen");
+  searchOverlay.setAttribute("aria-hidden", "false");
+  page?.classList.add("is-search-open");
+  page?.classList.remove("is-search-fullscreen");
 }
 
 function openPanelOverlay(kind) {
@@ -394,7 +419,8 @@ function closeSearchOverlay() {
 
   searchOverlay.classList.remove("is-open");
   searchOverlay.setAttribute("aria-hidden", "true");
-  page?.classList.remove("is-search-open");
+  searchOverlay.classList.remove("is-fullscreen");
+  page?.classList.remove("is-search-open", "is-search-fullscreen");
   embeddedSearchReady = false;
   pendingEmbeddedSearch = "";
 
@@ -460,6 +486,12 @@ function setupHeaderSearch() {
 
   messagesLauncher?.addEventListener("click", (event) => {
     event.preventDefault();
+
+    if (messagesOverlay?.classList.contains("is-open")) {
+      closePanelOverlay("messages");
+      return;
+    }
+
     openPanelOverlay("messages");
   });
 
@@ -474,6 +506,16 @@ function setupHeaderSearch() {
   window.addEventListener("message", (event) => {
     if (event.data?.type === "close-search-overlay") {
       closeSearchOverlay();
+      return;
+    }
+
+    if (event.data?.type === "expand-search-overlay") {
+      expandSearchOverlay();
+      return;
+    }
+
+    if (event.data?.type === "collapse-search-overlay") {
+      collapseSearchOverlay();
       return;
     }
 

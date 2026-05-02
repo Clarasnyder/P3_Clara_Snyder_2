@@ -4,6 +4,10 @@ const chatThread = document.getElementById("chat-thread");
 const chatCompose = document.getElementById("chat-compose");
 const chatInput = document.getElementById("chat-input");
 const params = new URLSearchParams(window.location.search);
+const isEmbedded = params.get("embedded") === "1" || window.parent !== window;
+const returnTo = params.get("returnTo") || "";
+const backLink = document.querySelector(".back-link");
+const navItems = document.querySelectorAll(".bottom-nav .nav-item");
 
 const conversationSeed = {
   "Brunch club": {
@@ -73,6 +77,50 @@ const conversation = conversationSeed[activeTitle] || {
   messages: [{ author: activeTitle, text: "Hey there!", self: false }]
 };
 
+function setupEmbeddedMode() {
+  if (!isEmbedded) {
+    return;
+  }
+
+  const homeLink = navItems[0];
+  const messagesLink = navItems[1];
+  const searchLink = navItems[2];
+  const profileLink = navItems[3];
+
+  if (!returnTo) {
+    backLink?.setAttribute("href", "../messages-page/index.html?embedded=1");
+  }
+
+  homeLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
+  });
+
+  messagesLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
+  });
+
+  searchLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.top.location.href = searchLink.getAttribute("href");
+  });
+
+  profileLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.parent.postMessage({ type: "open-panel-overlay", panel: "profile" }, "*");
+  });
+}
+
+function setupBackLink() {
+  if (!returnTo) {
+    return;
+  }
+
+  backLink?.setAttribute("href", returnTo);
+  backLink?.setAttribute("aria-label", "Back to member profile");
+}
+
 function createMessageRow({ author, text, self }) {
   const row = document.createElement("article");
   const authorElement = document.createElement("p");
@@ -114,6 +162,8 @@ function appendMessage(value) {
   chatThread.scrollTop = chatThread.scrollHeight;
 }
 
+setupBackLink();
+setupEmbeddedMode();
 renderMessages();
 
 chatCompose.addEventListener("submit", (event) => {
