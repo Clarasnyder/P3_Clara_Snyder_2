@@ -16,14 +16,15 @@ const rawDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
 const groupPageColors = {
-  "Brunch club": "#dcebff",
-  "Crafting crew": "#92bad5",
-  "Running club": "#dff478",
-  "Book club": "#eef4ff",
-  "Art walk": "#c8f05a",
-  Pickleball: "#788ce3"
+  "Brunch club": "#eef6ff",
+  "Crafting crew": "#e3f2fb",
+  "Running club": "#f2fbd1",
+  "Book club": "#f7faff",
+  "Art walk": "#eefad3",
+  Gardening: "#f2fbd1",
+  Pickleball: "#e3e9ff"
 };
-const paletteFallbacks = ["#dcebff", "#92bad5", "#dff478", "#eef4ff", "#c8f05a", "#788ce3", "#d8e4ff", "#edf7d4"];
+const paletteFallbacks = ["#eef6ff", "#e3f2fb", "#f2fbd1", "#f7faff", "#eefad3", "#e3e9ff", "#f1f6ff", "#f4fae7"];
 
 function hashString(value) {
   let hash = 2166136261;

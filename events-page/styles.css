@@ -196,10 +196,16 @@ body {
   place-items: center;
 }
 
+.calendar-grid {
+  row-gap: 0.18rem;
+  margin-top: 0.34rem;
+}
+
 .calendar-day {
-  aspect-ratio: 1 / 1;
-  margin-top: 0.24rem;
-  border-radius: 14px;
+  width: 1.82rem;
+  height: 1.82rem;
+  justify-self: center;
+  border-radius: 10px;
   color: var(--text);
   font: 500 0.84rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
 }
@@ -210,13 +216,13 @@ body {
 
 .calendar-day.is-highlighted {
   background: rgba(100, 120, 255, 0.14);
-  box-shadow: 0 8px 18px rgba(23, 36, 63, 0.12);
+  box-shadow: 0 5px 12px rgba(23, 36, 63, 0.1);
   color: var(--accent);
 }
 
 .calendar-day.is-highlighted-secondary {
   background: rgba(100, 120, 255, 0.14);
-  box-shadow: 0 8px 18px rgba(23, 36, 63, 0.12);
+  box-shadow: 0 5px 12px rgba(23, 36, 63, 0.1);
   color: var(--accent);
 }
 

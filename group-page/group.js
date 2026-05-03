@@ -42,14 +42,15 @@ const backTargets = {
   groups: "../my-groups-page/index.html"
 };
 const groupPageColors = {
-  "Brunch club": "#dcebff",
-  "Crafting crew": "#92bad5",
-  "Running club": "#dff478",
-  "Book club": "#eef4ff",
-  "Art walk": "#c8f05a",
-  Pickleball: "#788ce3"
+  "Brunch club": "#eef6ff",
+  "Crafting crew": "#e3f2fb",
+  "Running club": "#f2fbd1",
+  "Book club": "#f7faff",
+  "Art walk": "#eefad3",
+  Gardening: "#f2fbd1",
+  Pickleball: "#e3e9ff"
 };
-const paletteFallbacks = ["#dcebff", "#92bad5", "#dff478", "#eef4ff", "#c8f05a", "#788ce3", "#d8e4ff", "#edf7d4"];
+const paletteFallbacks = ["#eef6ff", "#e3f2fb", "#f2fbd1", "#f7faff", "#eefad3", "#e3e9ff", "#f1f6ff", "#f4fae7"];
 const sharedCheckinTasks = [
   {
     title: "Meet 2 new people",
@@ -261,6 +262,14 @@ function normalizeTitle(value) {
   return value.toLowerCase().trim();
 }
 
+function applyPageTheme(title) {
+  if (!pageElement) {
+    return;
+  }
+
+  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(title));
+}
+
 function getCheckinTasks(groupTitle) {
   const normalizedTitle = normalizeTitle(groupTitle);
   const directTasks = groupCheckinTasks[normalizedTitle];
@@ -470,11 +479,7 @@ backLink.addEventListener("click", () => {
   }
 });
 
-if (pageElement && groupPageColors[rawTitle]) {
-  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(rawTitle));
-} else if (pageElement) {
-  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(rawTitle));
-}
+applyPageTheme(rawTitle);
 
 membersButton.addEventListener("click", () => {
   const nextParams = new URLSearchParams({

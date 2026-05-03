@@ -215,9 +215,9 @@ body {
 .group-card {
   width: 100%;
   min-height: 3.8rem;
-  border: 1.5px solid rgba(55, 80, 15, 0.28);
+  border: 1.5px solid var(--group-action-border, rgba(55, 80, 15, 0.28));
   border-radius: 999px;
-  background: var(--accent-soft);
+  background: var(--group-action-bg, var(--accent-soft));
   box-shadow: var(--card-shadow);
   color: var(--text);
   font-size: 1.05rem;
@@ -227,12 +227,12 @@ body {
 }
 
 .group-card:hover {
-  background: var(--accent-soft-strong);
+  background: var(--group-action-bg-hover, var(--accent-soft-strong));
   box-shadow: 0 14px 24px rgba(23, 36, 63, 0.16);
 }
 
 .group-card:active {
-  background: #bedd51;
+  background: var(--group-action-bg-active, #bedd51);
   transform: scale(0.98);
   box-shadow: 0 8px 14px rgba(23, 36, 63, 0.14);
 }
