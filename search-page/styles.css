@@ -54,11 +54,12 @@ body {
   position: absolute;
   z-index: 6;
   left: 6.9652%;
-  top: 28px;
+  top: calc(var(--visual-viewport-offset-top, 0px) + 28px);
   display: flex;
   align-items: center;
   width: 86.0697%;
   background: transparent;
+  transition: top 0.16s ease;
 }
 
 .map-layer {
@@ -669,6 +670,10 @@ body.is-embedded .map-frame .maplibregl-ctrl-bottom-right {
   .phone-viewport {
     width: 100vw;
     height: var(--app-height, 100svh);
+  }
+
+  .hero-banner {
+    position: fixed;
   }
 
   .page {

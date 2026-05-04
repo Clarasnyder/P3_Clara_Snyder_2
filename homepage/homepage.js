@@ -31,6 +31,7 @@ const panelNavBackgrounds = {
   messages: "#f4f8ff"
 };
 const appHeightProperty = "--app-height";
+const visualViewportOffsetProperty = "--visual-viewport-offset-top";
 const knownMessageThreads = new Set([
   "Brunch Club",
   "Crafting Crew",
@@ -103,6 +104,11 @@ function setStableAppHeight() {
   document.documentElement.style.setProperty(appHeightProperty, `${window.innerHeight}px`);
 }
 
+function setVisualViewportOffset() {
+  const offsetTop = Math.max(0, window.visualViewport?.offsetTop || 0);
+  document.documentElement.style.setProperty(visualViewportOffsetProperty, `${offsetTop}px`);
+}
+
 function setupStableViewport() {
   if ("virtualKeyboard" in navigator) {
     try {
@@ -113,15 +119,23 @@ function setupStableViewport() {
   }
 
   setStableAppHeight();
+  setVisualViewportOffset();
   window.addEventListener("resize", () => {
+    setVisualViewportOffset();
     if (!isTextEntryFocused()) {
       setStableAppHeight();
     }
   });
   window.visualViewport?.addEventListener("resize", () => {
+    setVisualViewportOffset();
     if (!isTextEntryFocused()) {
       setStableAppHeight();
     }
+  });
+  window.visualViewport?.addEventListener("scroll", setVisualViewportOffset);
+  window.addEventListener("focusin", setVisualViewportOffset);
+  window.addEventListener("focusout", () => {
+    window.setTimeout(setVisualViewportOffset, 80);
   });
 }
 

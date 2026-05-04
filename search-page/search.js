@@ -52,6 +52,7 @@ const pageParams = new URLSearchParams(window.location.search);
 const isEmbedded = pageParams.get("embedded") === "1";
 const shouldAutoFocus = pageParams.get("autofocus") === "1";
 const appHeightProperty = "--app-height";
+const visualViewportOffsetProperty = "--visual-viewport-offset-top";
 
 function isTextEntryFocused() {
   const activeElement = document.activeElement;
@@ -61,6 +62,11 @@ function isTextEntryFocused() {
 
 function setStableAppHeight() {
   document.documentElement.style.setProperty(appHeightProperty, `${window.innerHeight}px`);
+}
+
+function setVisualViewportOffset() {
+  const offsetTop = Math.max(0, window.visualViewport?.offsetTop || 0);
+  document.documentElement.style.setProperty(visualViewportOffsetProperty, `${offsetTop}px`);
 }
 
 function setupStableViewport() {
@@ -73,17 +79,25 @@ function setupStableViewport() {
   }
 
   setStableAppHeight();
+  setVisualViewportOffset();
   window.addEventListener("resize", () => {
+    setVisualViewportOffset();
     if (!isTextEntryFocused()) {
       setStableAppHeight();
       map.resize();
     }
   });
   window.visualViewport?.addEventListener("resize", () => {
+    setVisualViewportOffset();
     if (!isTextEntryFocused()) {
       setStableAppHeight();
       map.resize();
     }
+  });
+  window.visualViewport?.addEventListener("scroll", setVisualViewportOffset);
+  window.addEventListener("focusin", setVisualViewportOffset);
+  window.addEventListener("focusout", () => {
+    window.setTimeout(setVisualViewportOffset, 80);
   });
 }
 
