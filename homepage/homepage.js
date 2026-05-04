@@ -105,8 +105,19 @@ function setStableAppHeight() {
 }
 
 function setVisualViewportOffset() {
-  const offsetTop = Math.max(0, window.visualViewport?.offsetTop || 0);
+  const offsetTop = Math.max(
+    0,
+    window.visualViewport?.offsetTop || 0,
+    window.scrollY || 0,
+    document.documentElement.scrollTop || 0
+  );
   document.documentElement.style.setProperty(visualViewportOffsetProperty, `${offsetTop}px`);
+  document.documentElement.classList.toggle("is-keyboard-frozen", offsetTop > 0 && isTextEntryFocused());
+}
+
+function clearVisualViewportOffset() {
+  document.documentElement.style.setProperty(visualViewportOffsetProperty, "0px");
+  document.documentElement.classList.remove("is-keyboard-frozen");
 }
 
 function setupStableViewport() {
@@ -135,7 +146,7 @@ function setupStableViewport() {
   window.visualViewport?.addEventListener("scroll", setVisualViewportOffset);
   window.addEventListener("focusin", setVisualViewportOffset);
   window.addEventListener("focusout", () => {
-    window.setTimeout(setVisualViewportOffset, 80);
+    window.setTimeout(clearVisualViewportOffset, 80);
   });
 }
 

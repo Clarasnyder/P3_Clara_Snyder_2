@@ -335,7 +335,7 @@ body {
 }
 
 .page.is-search-open .bottom-search-dock {
-  top: calc(var(--visual-viewport-offset-top, 0px) + 140px);
+  top: 140px;
   bottom: auto;
 }
 
@@ -787,6 +787,10 @@ body {
   .phone-viewport {
     width: 100vw;
     height: var(--app-height, 100svh);
+  }
+
+  html.is-keyboard-frozen .phone-viewport {
+    transform: translateY(var(--visual-viewport-offset-top, 0px));
   }
 
   .page.is-search-open .bottom-search-dock {
