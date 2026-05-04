@@ -163,7 +163,7 @@ body {
   border: 0;
   background: transparent;
   color: var(--text);
-  font: 400 16px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 16px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   outline: none;
 }
 
@@ -201,7 +201,7 @@ body {
   border-bottom: 1px solid var(--line);
   background: transparent;
   color: var(--text);
-  font: 400 14px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 14px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: left;
   padding: 18px;
   cursor: pointer;
@@ -269,7 +269,7 @@ body {
 
 .group-sheet-title {
   margin: 8px 0 10px;
-  font: 400 32px/1.05 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 32px/1.05 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
 }
 
@@ -301,14 +301,14 @@ body {
 .group-sheet-members-text {
   margin: 0;
   color: var(--text);
-  font: 400 16px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 16px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .group-sheet-description {
   max-width: 248px;
   margin: 0;
   color: var(--muted);
-  font: 400 16px/1.42 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 16px/1.42 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .group-sheet-actions {
@@ -327,7 +327,7 @@ body {
   background: var(--accent-soft);
   box-shadow: 0 10px 20px rgba(23, 36, 63, 0.16);
   color: var(--text);
-  font: 600 18px/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 18px/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
   transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
@@ -352,7 +352,7 @@ body {
   border: 0;
   background: transparent;
   color: var(--accent);
-  font: 500 14px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 14px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   text-decoration: underline;
   text-underline-offset: 3px;
   cursor: pointer;
@@ -448,7 +448,7 @@ body {
 .invite-loading-title {
   margin: 0;
   color: var(--text);
-  font: 600 1rem/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 1rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: center;
 }
 
@@ -465,7 +465,7 @@ body {
 .invite-modal-title {
   margin: 0 0 20px;
   color: var(--text);
-  font: 500 1.15rem/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 1.15rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: center;
 }
 
@@ -482,7 +482,7 @@ body {
   background: var(--surface-bg);
   padding: 0 18px;
   color: var(--text);
-  font: 400 16px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 16px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   outline: none;
 }
 
@@ -529,15 +529,15 @@ body {
 .request-overlay-title {
   margin: 0;
   color: #17243f;
-  font: 500 2.2rem/1.05 Inter, "Helvetica Neue", Arial, sans-serif;
-  letter-spacing: -0.02em;
+  font: 400 2.2rem/1.05 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0;
 }
 
 .request-overlay-message {
   max-width: 268px;
   margin: 14px 0 0;
   color: rgba(23, 36, 63, 0.78);
-  font: 400 0.98rem/1.45 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 0.98rem/1.45 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .bottom-nav {

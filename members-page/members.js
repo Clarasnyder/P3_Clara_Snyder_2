@@ -21,7 +21,7 @@ document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded
 
 const memberSeed = {
   "Brunch club": [
-    { name: "Jane Doe", age: 23 },
+    { name: "Sophie", age: 23 },
     { name: "Maya", age: 24 },
     { name: "Noah", age: 26 },
     { name: "Ava", age: 22 },
@@ -118,16 +118,9 @@ const fallbackNames = [
   "Anika",
   "Bennett"
 ];
-const groupPageColors = {
-  "Brunch club": "#eef6ff",
-  "Crafting crew": "#e3f2fb",
-  "Running club": "#f2fbd1",
-  "Book club": "#f7faff",
-  "Art walk": "#eefad3",
-  Gardening: "#f2fbd1",
-  Pickleball: "#e3e9ff"
-};
-const paletteFallbacks = ["#eef6ff", "#e3f2fb", "#f2fbd1", "#f7faff", "#eefad3", "#e3e9ff", "#f1f6ff", "#f4fae7"];
+const groupPageColor = "#dcebff";
+const groupPageBackground =
+  "radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), #dcebff";
 const profileDetails = [
   {
     prompt: "Usually up for",
@@ -143,35 +136,18 @@ const profileDetails = [
   }
 ];
 
-function hashString(value) {
-  let hash = 2166136261;
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  return hash >>> 0;
-}
-
-function getGroupPageColor(title) {
-  if (groupPageColors[title]) {
-    return groupPageColors[title];
-  }
-
-  return paletteFallbacks[hashString(title) % paletteFallbacks.length];
-}
-
 function applyPageTheme(title) {
   if (!pageElement) {
     return;
   }
 
-  const pageColor = getGroupPageColor(title);
-  pageElement.style.setProperty("--group-page-bg", pageColor);
+  pageElement.style.setProperty("--group-page-bg", groupPageColor);
 
   if (isSearchEmbedded) {
-    window.parent.postMessage({ type: "set-shell-nav-background", color: pageColor }, "*");
+    window.parent.postMessage(
+      { type: "set-shell-nav-background", color: groupPageColor, background: groupPageBackground },
+      "*"
+    );
   }
 }
 
@@ -356,13 +332,23 @@ function renderMembers() {
 
       const returnParams = new URLSearchParams(window.location.search);
       const returnUrl = new URL(window.location.href);
-      const messageParams = new URLSearchParams({ title: member.name });
+      const shellParams = new URLSearchParams({
+        panel: "messages",
+        thread: member.name
+      });
 
       returnParams.set("profile", member.name);
       returnUrl.search = returnParams.toString();
-      messageParams.set("returnTo", `../members-page/index.html?${returnParams.toString()}`);
+      shellParams.set("returnTo", `../members-page/index.html?${returnParams.toString()}`);
+
+      if (isSearchEmbedded) {
+        window.history.replaceState(null, "", returnUrl.toString());
+        window.parent.postMessage({ type: "open-message-thread", title: member.name, returnTo: "panel" }, "*");
+        return;
+      }
+
       window.history.replaceState(null, "", returnUrl.toString());
-      window.location.href = `../group-text-page/index.html?${messageParams.toString()}`;
+      window.location.href = `../homepage/index.html?${shellParams.toString()}`;
     });
 
     cardFront.append(avatar, name, age, action);

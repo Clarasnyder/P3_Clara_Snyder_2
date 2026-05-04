@@ -4,7 +4,8 @@ const chatThread = document.getElementById("chat-thread");
 const chatCompose = document.getElementById("chat-compose");
 const chatInput = document.getElementById("chat-input");
 const params = new URLSearchParams(window.location.search);
-const isEmbedded = params.get("embedded") === "1" || window.parent !== window;
+const isFramed = window.parent !== window;
+const isEmbedded = params.get("embedded") === "1" || isFramed;
 const returnTo = params.get("returnTo") || "";
 const backLink = document.querySelector(".back-link");
 const profileNavLink = document.getElementById("profile-nav-link");
@@ -12,6 +13,7 @@ const groupsNavLink = document.getElementById("groups-nav-link");
 const messagesNavLink = document.getElementById("messages-nav-link");
 
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
+document.documentElement.classList.toggle("is-framed", isFramed);
 
 const conversationSeed = {
   "Brunch club": {
@@ -77,9 +79,106 @@ const conversationSeed = {
 
 const activeTitle = params.get("title") || "Brunch club";
 const conversation = conversationSeed[activeTitle] || {
-  subtitle: "Conversation",
-  messages: [{ author: activeTitle, text: "Hey there!", self: false }]
+  subtitle: "Direct message",
+  messages: [
+    { author: activeTitle, text: "Hey there! It was nice meeting you at the group.", self: false },
+    { author: "You", text: "You too. I liked what you said about trying a smaller meetup first.", self: true },
+    { author: activeTitle, text: "Same. Want to go to the next one together?", self: false },
+    { author: "You", text: "Yes, that sounds way less intimidating.", self: true }
+  ]
 };
+
+function postPanelNavigation(panel) {
+  window.parent.postMessage({ type: "navigate-panel", panel }, "*");
+}
+
+function setupEmbeddedPanelSwipes() {
+  if (!isEmbedded) {
+    return;
+  }
+
+  let startX = 0;
+  let startY = 0;
+  let pointerId = null;
+
+  const ignoredSwipeTarget = (target) =>
+    target?.closest?.("input, textarea, select, button");
+
+  const handleSwipeEnd = (endX, endY) => {
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+
+    if (Math.abs(deltaX) < 72 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.35) {
+      return;
+    }
+
+    postPanelNavigation(deltaX > 0 ? "groups" : "messages");
+  };
+
+  document.addEventListener(
+    "touchstart",
+    (event) => {
+      if (ignoredSwipeTarget(event.target)) {
+        return;
+      }
+
+      const touch = event.touches[0];
+
+      if (!touch) {
+        return;
+      }
+
+      startX = touch.clientX;
+      startY = touch.clientY;
+    },
+    { passive: true }
+  );
+
+  document.addEventListener(
+    "touchend",
+    (event) => {
+      if (ignoredSwipeTarget(event.target)) {
+        return;
+      }
+
+      const touch = event.changedTouches[0];
+
+      if (!touch) {
+        return;
+      }
+
+      handleSwipeEnd(touch.clientX, touch.clientY);
+    },
+    { passive: true }
+  );
+
+  document.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    if (ignoredSwipeTarget(event.target)) {
+      return;
+    }
+
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+  });
+
+  document.addEventListener("pointerup", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
+
+    pointerId = null;
+    handleSwipeEnd(event.clientX, event.clientY);
+  });
+
+  document.addEventListener("pointercancel", () => {
+    pointerId = null;
+  });
+}
 
 function setupEmbeddedMode() {
   if (!isEmbedded) {
@@ -92,7 +191,7 @@ function setupEmbeddedMode() {
 
   groupsNavLink?.addEventListener("click", (event) => {
     event.preventDefault();
-    window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
+    postPanelNavigation("groups");
   });
 
   messagesNavLink?.addEventListener("click", (event) => {
@@ -101,8 +200,7 @@ function setupEmbeddedMode() {
 
   profileNavLink?.addEventListener("click", (event) => {
     event.preventDefault();
-    window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
-    window.parent.postMessage({ type: "open-panel-overlay", panel: "profile" }, "*");
+    postPanelNavigation("profile");
   });
 }
 
@@ -111,8 +209,25 @@ function setupBackLink() {
     return;
   }
 
-  backLink?.setAttribute("href", returnTo);
+  const shouldReturnToUnderlyingPanel = returnTo === "panel";
+
+  backLink?.setAttribute("href", shouldReturnToUnderlyingPanel ? "#" : returnTo);
   backLink?.setAttribute("aria-label", "Back to member profile");
+
+  if (!isFramed) {
+    return;
+  }
+
+  backLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    if (shouldReturnToUnderlyingPanel) {
+      window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
+      return;
+    }
+
+    window.top.location.href = new URL(returnTo, window.location.href).href;
+  });
 }
 
 function createMessageRow({ author, text, self }) {
@@ -158,6 +273,7 @@ function appendMessage(value) {
 
 setupBackLink();
 setupEmbeddedMode();
+setupEmbeddedPanelSwipes();
 renderMessages();
 
 chatCompose.addEventListener("submit", (event) => {

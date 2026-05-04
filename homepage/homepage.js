@@ -29,6 +29,15 @@ const panelNavBackgrounds = {
   profile: "#f4f8ff",
   messages: "#f4f8ff"
 };
+const knownMessageThreads = new Set([
+  "Brunch club",
+  "Crafting crew",
+  "Pickleball",
+  "Maya",
+  "Running club",
+  "Jordan",
+  "Art walk"
+]);
 const seedSuggestions = [
   "pickleball",
   "hiking",
@@ -75,6 +84,7 @@ const detailParts = [
   "recurring neighborhood sessions and spontaneous plans.",
   "meeting up with people who share the same interest."
 ];
+const panelOrder = ["profile", "groups", "messages"];
 
 function getGroupPagePath() {
   return window.location.pathname.includes("/homepage/")
@@ -94,10 +104,29 @@ function getMessagesPagePath() {
     : "./messages-page/index.html";
 }
 
+function getGroupTextPagePath() {
+  return window.location.pathname.includes("/homepage/")
+    ? "../group-text-page/index.html"
+    : "./group-text-page/index.html";
+}
+
 function getProfilePagePath() {
   return window.location.pathname.includes("/homepage/")
     ? "../my-groups-page/index.html"
     : "./my-groups-page/index.html";
+}
+
+function buildMessageThreadUrl(title = "Message", returnTo = "") {
+  const threadParams = new URLSearchParams({
+    title,
+    embedded: "1"
+  });
+
+  if (returnTo) {
+    threadParams.set("returnTo", returnTo);
+  }
+
+  return `${getGroupTextPagePath()}?${threadParams.toString()}`;
 }
 
 function buildEmbeddedSearchUrl(query = "") {
@@ -367,11 +396,11 @@ function collapseSearchOverlay() {
   page?.classList.remove("is-search-fullscreen");
 }
 
-function openPanelOverlay(kind) {
+function openPanelOverlay(kind, overrideSrc = "") {
   const isMessages = kind === "messages";
   const overlay = isMessages ? messagesOverlay : profileOverlay;
   const frame = isMessages ? messagesOverlayFrame : profileOverlayFrame;
-  const src = `${isMessages ? getMessagesPagePath() : getProfilePagePath()}?embedded=1`;
+  const src = overrideSrc || `${isMessages ? getMessagesPagePath() : getProfilePagePath()}?embedded=1`;
   const otherOverlay = isMessages ? profileOverlay : messagesOverlay;
 
   if (!overlay || !frame) {
@@ -410,6 +439,50 @@ function closePanelOverlay(kind) {
   }
 }
 
+function showGroupsPanel() {
+  resetShellNavBackground();
+  profileOverlay?.classList.remove("is-open");
+  profileOverlay?.setAttribute("aria-hidden", "true");
+  messagesOverlay?.classList.remove("is-open");
+  messagesOverlay?.setAttribute("aria-hidden", "true");
+  page?.classList.remove("is-panel-profile", "is-panel-messages");
+  setActiveNav("groups");
+}
+
+function navigateToPanel(kind) {
+  if (!panelOrder.includes(kind)) {
+    return;
+  }
+
+  if (kind === activePanel) {
+    if (page?.classList.contains("is-search-open")) {
+      closeSearchOverlay();
+    }
+
+    return;
+  }
+
+  closeSearchOverlay();
+
+  if (kind === "groups") {
+    showGroupsPanel();
+    return;
+  }
+
+  openPanelOverlay(kind);
+}
+
+function navigateRelativePanel(direction) {
+  const currentIndex = panelOrder.indexOf(activePanel);
+  const nextIndex = currentIndex + direction;
+
+  if (currentIndex === -1 || nextIndex < 0 || nextIndex >= panelOrder.length) {
+    return;
+  }
+
+  navigateToPanel(panelOrder[nextIndex]);
+}
+
 function setActiveNav(kind) {
   activePanel = kind;
   const navItems = [
@@ -444,8 +517,21 @@ function setShellNavBackground(color = "") {
   resetShellNavBackground();
 }
 
+function setShellNavBackgroundImage(background = "") {
+  if (background) {
+    page?.style.setProperty("--shell-nav-image", background);
+    page?.classList.add("is-shell-group-page");
+    return;
+  }
+
+  page?.style.removeProperty("--shell-nav-image");
+  page?.classList.remove("is-shell-group-page");
+}
+
 function resetShellNavBackground() {
   page?.style.removeProperty("--shell-nav-bg");
+  page?.style.removeProperty("--shell-nav-image");
+  page?.classList.remove("is-shell-group-page");
 }
 
 function sendEmbeddedSearch(query) {
@@ -540,19 +626,17 @@ function setupHeaderSearch() {
 
   profileLauncher?.addEventListener("click", (event) => {
     event.preventDefault();
-    openPanelOverlay("profile");
+    navigateToPanel("profile");
   });
 
   groupsLauncher?.addEventListener("click", (event) => {
     event.preventDefault();
-    resetShellNavBackground();
-    closePanelOverlay("profile");
-    closePanelOverlay("messages");
+    navigateToPanel("groups");
   });
 
   messagesLauncher?.addEventListener("click", (event) => {
     event.preventDefault();
-    openPanelOverlay("messages");
+    navigateToPanel("messages");
   });
 
   profileOverlayBackdrop?.addEventListener("click", () => {
@@ -581,6 +665,7 @@ function setupHeaderSearch() {
 
     if (event.data?.type === "set-shell-nav-background") {
       setShellNavBackground(event.data.color);
+      setShellNavBackgroundImage(event.data.background || "");
       return;
     }
 
@@ -600,7 +685,17 @@ function setupHeaderSearch() {
     }
 
     if (event.data?.type === "open-panel-overlay") {
-      openPanelOverlay(event.data.panel);
+      navigateToPanel(event.data.panel);
+      return;
+    }
+
+    if (event.data?.type === "navigate-panel") {
+      navigateToPanel(event.data.panel);
+      return;
+    }
+
+    if (event.data?.type === "open-message-thread") {
+      openPanelOverlay("messages", buildMessageThreadUrl(event.data.title || "Message", event.data.returnTo || ""));
       return;
     }
 
@@ -627,6 +722,73 @@ function setupHeaderSearch() {
       dropdown.classList.add("is-hidden");
     }
   });
+}
+
+function setupPanelSwipes() {
+  if (!page) {
+    return;
+  }
+
+  let startX = 0;
+  let startY = 0;
+  let pointerId = null;
+
+  const ignoredSwipeTarget = (target) =>
+    target?.closest?.(
+      "a, button, input, textarea, select, .search-area, .search-overlay, .panel-overlay, .card-photo-shell-swipeable"
+    );
+
+  page.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    if (page.classList.contains("is-search-open") || ignoredSwipeTarget(event.target)) {
+      return;
+    }
+
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+  });
+
+  page.addEventListener("pointerup", (event) => {
+    if (pointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    pointerId = null;
+
+    if (Math.abs(deltaX) < 72 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.35) {
+      return;
+    }
+
+    navigateRelativePanel(deltaX < 0 ? 1 : -1);
+  });
+
+  page.addEventListener("pointercancel", () => {
+    pointerId = null;
+  });
+}
+
+function setupInitialPanelFromParams() {
+  const pageParams = new URLSearchParams(window.location.search);
+
+  if (pageParams.get("panel") !== "messages") {
+    return;
+  }
+
+  const thread = pageParams.get("thread") || "Message";
+  const returnTo =
+    pageParams.get("returnTo") ||
+    (knownMessageThreads.has(thread) ? "" : `../members-page/index.html?profile=${encodeURIComponent(thread)}`);
+
+  openPanelOverlay(
+    "messages",
+    buildMessageThreadUrl(thread, returnTo)
+  );
 }
 
 function renderCardTitles() {
@@ -817,3 +979,5 @@ setupGroupButtons();
 resetPendingGroupsOnRefresh();
 renderPendingGroups();
 setupHeaderSearch();
+setupPanelSwipes();
+setupInitialPanelFromParams();

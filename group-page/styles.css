@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "Alan Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/alan-sans:vf@latest/latin-wght-normal.woff2")
+    format("woff2-variations");
+}
+
 :root {
   --page-bg: #f4f8ff;
   --hero-bg: #17243f;
@@ -57,7 +66,7 @@ body {
   inset: 0 0 auto 0;
   z-index: 3;
   height: 88px;
-  background: var(--group-page-bg, var(--page-bg));
+  background: transparent;
 }
 
 .is-search-embedded .hero-banner {
@@ -85,7 +94,7 @@ body {
   height: 36px;
   border-radius: 999px;
   color: var(--text);
-  font: 600 0.86rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 600 0.86rem/1 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   text-decoration: none;
   transition: transform 0.15s ease, opacity 0.15s ease;

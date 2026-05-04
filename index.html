@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Link</title>
     <style>
+      @font-face {
+        font-family: "Alan Sans";
+        font-style: normal;
+        font-display: swap;
+        font-weight: 300 900;
+        src: url("https://cdn.jsdelivr.net/fontsource/fonts/alan-sans:vf@latest/latin-wght-normal.woff2")
+          format("woff2-variations");
+      }
+
       :root {
         --app-shell-bg: #dcebff;
         --splash-bg: #17243f;
@@ -97,10 +106,13 @@
       .splash-title {
         margin: 0;
         color: var(--splash-text);
-        font-size: 44px;
-        font-weight: 700;
+        font-family: "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
+        width: 100%;
+        font-size: 60px;
+        font-weight: 400;
         line-height: 1;
         letter-spacing: 0;
+        text-align: center;
       }
 
       .splash-screen.is-fading {

@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "Alan Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/alan-sans:vf@latest/latin-wght-normal.woff2")
+    format("woff2-variations");
+}
+
 :root {
   --screen-width: 402px;
   --screen-height: 874px;
@@ -55,9 +64,16 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 88px;
-  background: var(--shell-nav-bg, transparent);
+  height: 116px;
+  background: var(--shell-nav-image, var(--shell-nav-bg, var(--page-bg)));
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 78px, rgba(0, 0, 0, 0.72) 94px, transparent 116px);
+  mask-image: linear-gradient(180deg, #000 0, #000 78px, rgba(0, 0, 0, 0.72) 94px, transparent 116px);
   pointer-events: none;
+}
+
+.page.is-search-open:not(.is-shell-group-page) .hero-banner {
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .top-nav {
@@ -102,7 +118,7 @@ body {
   background: transparent;
   padding: 0 18px;
   color: var(--text);
-  font: 500 16px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 16px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   outline: none;
 }
 
@@ -136,7 +152,7 @@ body {
   border-bottom: 1px solid var(--line);
   background: transparent;
   color: var(--text);
-  font: 400 14px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 14px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: left;
   padding: 18px;
   cursor: pointer;
@@ -201,6 +217,7 @@ body {
   inset: 0;
   border: 0;
   background: rgba(23, 36, 63, 0.16);
+  backdrop-filter: blur(12px);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.18s ease;
@@ -336,46 +353,12 @@ body {
   height: 214%;
 }
 
-.home-intro {
-  position: absolute;
-  top: 13%;
-  left: 6.7164%;
-  right: 6.9652%;
-  z-index: 2;
-  display: grid;
-  gap: 8px;
-  color: var(--text);
-  pointer-events: none;
-  transition: transform 0.34s cubic-bezier(0.2, 0.88, 0.24, 1);
-  will-change: transform;
-}
-
-.home-intro::before {
-  content: "";
-  position: absolute;
-  top: -114px;
-  right: calc(-1 * 6.9652% / 0.863184);
-  bottom: -16px;
-  left: calc(-1 * 6.7164% / 0.863184);
-  z-index: -1;
-  background: var(--page-bg);
-}
-
-.home-greeting {
-  margin: 0;
-  font-size: 1.7rem;
-  font-weight: 500;
-  line-height: 1.1;
-}
-
-.page.is-panel-profile .home-intro,
 .page.is-panel-profile .scroll-region,
 .page.is-panel-profile .bottom-search-dock,
 .page.is-panel-profile .search-overlay {
   transform: translateX(100%);
 }
 
-.page.is-panel-messages .home-intro,
 .page.is-panel-messages .scroll-region,
 .page.is-panel-messages .bottom-search-dock,
 .page.is-panel-messages .search-overlay {
@@ -404,8 +387,8 @@ body {
   right: 28px;
   margin: 0;
   color: var(--text);
-  font: 600 1.7rem/1.05 Inter, "Helvetica Neue", Arial, sans-serif;
-  letter-spacing: -0.03em;
+  font: 400 1.7rem/1.05 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0;
   text-align: center;
 }
 
@@ -510,7 +493,7 @@ body {
   background: var(--accent-soft);
   box-shadow: 0 10px 20px rgba(23, 36, 63, 0.16);
   color: var(--text);
-  font: 600 18px/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 18px/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
   transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
@@ -532,23 +515,23 @@ body {
 }
 
 .card-one {
-  top: 26%;
+  top: 17%;
 }
 
 .card-two {
-  top: 83.6659%;
+  top: 74.6659%;
   background: var(--card-bg);
 }
 
 .card-three {
-  top: 141.3318%;
+  top: 132.3318%;
   background: var(--card-bg);
   border-radius: 24px;
 }
 
 .pending-links-shell {
   position: absolute;
-  top: 198.1636%;
+  top: 189.1636%;
   left: 6.7164%;
   width: 86.3184%;
   display: grid;
@@ -558,7 +541,7 @@ body {
 .pending-links-heading h2 {
   margin: 0;
   color: var(--text);
-  font: 600 1rem/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 1rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .pending-links-list {
@@ -581,7 +564,7 @@ body {
 .pending-link-title {
   margin: 0;
   color: var(--text);
-  font: 600 1rem/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 1rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .pending-link-status {
@@ -594,7 +577,7 @@ body {
   border-radius: 999px;
   background: rgba(100, 120, 255, 0.12);
   color: var(--accent);
-  font: 600 0.84rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 0.84rem/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .nav-item {
@@ -605,7 +588,7 @@ body {
   height: 36px;
   border-radius: 999px;
   color: var(--text);
-  font: 600 0.86rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 600 0.86rem/1 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   text-decoration: none;
   transition: transform 0.15s ease, opacity 0.15s ease;

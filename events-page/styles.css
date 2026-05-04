@@ -1,3 +1,12 @@
+@font-face {
+  font-family: "Alan Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/alan-sans:vf@latest/latin-wght-normal.woff2")
+    format("woff2-variations");
+}
+
 :root {
   --page-bg: #f4f8ff;
   --hero-bg: #17243f;
@@ -56,8 +65,15 @@ body {
   position: absolute;
   inset: 0 0 auto 0;
   z-index: 3;
-  height: 88px;
-  background: var(--group-page-bg, var(--page-bg));
+  height: 116px;
+  background:
+    linear-gradient(180deg, rgba(220, 235, 255, 0) 78px, rgba(220, 235, 255, 0) 88px, rgba(220, 235, 255, 0) 100%),
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%),
+    radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%),
+    var(--group-page-bg, var(--page-bg));
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 78px, rgba(0, 0, 0, 0.72) 94px, transparent 116px);
+  mask-image: linear-gradient(180deg, #000 0, #000 78px, rgba(0, 0, 0, 0.72) 94px, transparent 116px);
 }
 
 .is-search-embedded .hero-banner {
@@ -85,7 +101,7 @@ body {
   height: 36px;
   border-radius: 999px;
   color: var(--text);
-  font: 600 0.86rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 600 0.86rem/1 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   text-decoration: none;
   transition: transform 0.15s ease, opacity 0.15s ease;

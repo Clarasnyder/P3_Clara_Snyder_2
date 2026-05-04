@@ -44,16 +44,9 @@ const backTargets = {
   home: "../homepage/index.html",
   groups: "../my-groups-page/index.html"
 };
-const groupPageColors = {
-  "Brunch club": "#eef6ff",
-  "Crafting crew": "#e3f2fb",
-  "Running club": "#f2fbd1",
-  "Book club": "#f7faff",
-  "Art walk": "#eefad3",
-  Gardening: "#f2fbd1",
-  Pickleball: "#e3e9ff"
-};
-const paletteFallbacks = ["#eef6ff", "#e3f2fb", "#f2fbd1", "#f7faff", "#eefad3", "#e3e9ff", "#f1f6ff", "#f4fae7"];
+const groupPageColor = "#dcebff";
+const groupPageBackground =
+  "radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), #dcebff";
 const sharedCheckinTasks = [
   {
     title: "Meet 2 new people",
@@ -242,25 +235,6 @@ const keywordCheckinTasks = [
 let activeCheckinTaskIndex = 0;
 let cameraStream = null;
 
-function hashString(value) {
-  let hash = 2166136261;
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  return hash >>> 0;
-}
-
-function getGroupPageColor(title) {
-  if (groupPageColors[title]) {
-    return groupPageColors[title];
-  }
-
-  return paletteFallbacks[hashString(title) % paletteFallbacks.length];
-}
-
 function normalizeTitle(value) {
   return value.toLowerCase().trim();
 }
@@ -270,11 +244,13 @@ function applyPageTheme(title) {
     return;
   }
 
-  const pageColor = getGroupPageColor(title);
-  pageElement.style.setProperty("--group-page-bg", pageColor);
+  pageElement.style.setProperty("--group-page-bg", groupPageColor);
 
   if (isSearchEmbedded) {
-    window.parent.postMessage({ type: "set-shell-nav-background", color: pageColor }, "*");
+    window.parent.postMessage(
+      { type: "set-shell-nav-background", color: groupPageColor, background: groupPageBackground },
+      "*"
+    );
   }
 }
 
