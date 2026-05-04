@@ -39,7 +39,8 @@ body {
   place-items: center;
   padding: 16px;
   background: #dcebff;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
 }
 
 .phone-viewport {
@@ -198,6 +199,7 @@ body {
 .group-title {
   margin: 0;
   color: var(--text);
+  font-family: "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
   font-size: 2rem;
   font-weight: 400;
   line-height: 1.05;
@@ -240,7 +242,7 @@ body {
   margin: 0;
   color: var(--accent);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.2;
 }
 
@@ -267,7 +269,7 @@ body {
   box-shadow: var(--card-shadow);
   color: var(--text);
   font-size: 1.05rem;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
@@ -352,7 +354,7 @@ body {
   margin: 0 0 0.45rem;
   color: var(--accent);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -361,7 +363,7 @@ body {
   margin: 0;
   color: var(--text);
   font-size: 1.55rem;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.08;
 }
 
@@ -369,7 +371,7 @@ body {
   margin: 0.9rem 0 1.25rem;
   color: var(--muted);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.42;
 }
 
@@ -383,7 +385,7 @@ body {
 .checkin-secondary {
   min-height: 3rem;
   border-radius: 999px;
-  font: 700 0.98rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 0.98rem/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
   transition: transform 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
 }
@@ -434,7 +436,7 @@ body {
   margin: 0;
   color: var(--text);
   font-size: 1.3rem;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.08;
 }
 
@@ -445,7 +447,7 @@ body {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.64);
   color: var(--text);
-  font: 700 0.88rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 0.88rem/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
   cursor: pointer;
 }
 
@@ -481,7 +483,7 @@ body {
   gap: 0.35rem;
   color: var(--text);
   font-size: 0.72rem;
-  font-weight: 800;
+  font-weight: 400;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -547,7 +549,7 @@ body {
   margin: 0;
   color: var(--text);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.35;
   text-align: center;
 }
@@ -565,7 +567,7 @@ body {
   margin: 0;
   color: #ffffff;
   font-size: 0.95rem;
-  font-weight: 800;
+  font-weight: 400;
   text-align: center;
   text-shadow: 0 2px 8px rgba(18, 27, 48, 0.45);
 }

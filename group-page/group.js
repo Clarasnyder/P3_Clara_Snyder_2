@@ -41,7 +41,7 @@ document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded
 
 const backTargets = {
   search: "../search-page/index.html",
-  home: "../homepage/index.html",
+  home: "../homepage/index.html?skipSplash=1",
   groups: "../my-groups-page/index.html"
 };
 const groupPageColor = "#dcebff";

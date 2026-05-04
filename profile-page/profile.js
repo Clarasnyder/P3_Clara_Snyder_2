@@ -18,7 +18,7 @@ function setupEmbeddedMode() {
 
   closeButton?.addEventListener("click", (event) => {
     event.preventDefault();
-    window.location.href = "../homepage/index.html";
+    window.location.href = "../homepage/index.html?skipSplash=1";
   });
 }
 

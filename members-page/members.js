@@ -20,14 +20,14 @@ const groupDescription =
 document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded);
 
 const memberSeed = {
-  "Brunch club": [
+  "Brunch Club": [
     { name: "Sophie", age: 23 },
     { name: "Maya", age: 24 },
     { name: "Noah", age: 26 },
     { name: "Ava", age: 22 },
     { name: "Luca", age: 25 }
   ],
-  "Crafting crew": [
+  "Crafting Crew": [
     { name: "Lena", age: 27 },
     { name: "Tara", age: 25 },
     { name: "Reese", age: 24 },
@@ -334,7 +334,8 @@ function renderMembers() {
       const returnUrl = new URL(window.location.href);
       const shellParams = new URLSearchParams({
         panel: "messages",
-        thread: member.name
+        thread: member.name,
+        skipSplash: "1"
       });
 
       returnParams.set("profile", member.name);

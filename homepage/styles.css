@@ -463,7 +463,7 @@ body {
   right: 28px;
   margin: 0;
   color: var(--text);
-  font: 400 1.7rem/1.05 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 1.7rem/1.05 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
   letter-spacing: 0;
   text-align: center;
 }
@@ -514,7 +514,7 @@ body {
 .card-photo-description-text {
   margin: 0;
   color: #f8fbff;
-  font: 500 0.9rem/1.4 Inter, "Helvetica Neue", Arial, sans-serif;
+  font: 400 0.9rem/1.4 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .card-photo-dots {
@@ -775,7 +775,7 @@ body {
 
   .phone-viewport {
     width: 100vw;
-    height: 100dvh;
+    height: var(--app-height, 100svh);
   }
 
   .page {

@@ -23,7 +23,7 @@ const groupPageBackground =
   "radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), #dcebff";
 
 const eventDirectory = {
-  "Brunch club": {
+  "Brunch Club": {
     month: "May 2026",
     highlights: [
       { day: 3, tone: "primary" },
@@ -60,7 +60,7 @@ const eventDirectory = {
       }
     ]
   },
-  "Crafting crew": {
+  "Crafting Crew": {
     month: "May 2026",
     highlights: [
       { day: 5, tone: "primary" },

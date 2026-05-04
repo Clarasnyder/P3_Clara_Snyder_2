@@ -2,7 +2,7 @@ const page = document.querySelector(".page");
 const params = new URLSearchParams(window.location.search);
 const returnTarget = params.get("return");
 const returnUrls = {
-  feed: "../homepage/index.html",
+  feed: "../homepage/index.html?skipSplash=1",
   search: "../search-page/index.html"
 };
 

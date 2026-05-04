@@ -16,7 +16,7 @@ document.documentElement.classList.toggle("is-embedded", isEmbedded);
 document.documentElement.classList.toggle("is-framed", isFramed);
 
 const conversationSeed = {
-  "Brunch club": {
+  "Brunch Club": {
     subtitle: "24 members",
     messages: [
       { author: "Ava", text: "Saturday still works for me. Who's free at 11?", self: false },
@@ -26,7 +26,7 @@ const conversationSeed = {
       { author: "You", text: "Perfect. I can make us a reservation for six.", self: true }
     ]
   },
-  "Crafting crew": {
+  "Crafting Crew": {
     subtitle: "19 members",
     messages: [
       { author: "Lena", text: "I can bring yarn and extra scissors.", self: false },
@@ -77,7 +77,7 @@ const conversationSeed = {
   }
 };
 
-const activeTitle = params.get("title") || "Brunch club";
+const activeTitle = params.get("title") || "Brunch Club";
 const conversation = conversationSeed[activeTitle] || {
   subtitle: "Direct message",
   messages: [
@@ -291,6 +291,7 @@ function renderMessages() {
   chatSubtitle.textContent = conversation.subtitle;
   chatInput.placeholder = `Message ${activeTitle}`;
   document.title = `${activeTitle} Chat`;
+  document.body.classList.toggle("is-group-thread", conversation.subtitle !== "Direct message");
   chatThread.innerHTML = "";
 
   conversation.messages.forEach((message) => {

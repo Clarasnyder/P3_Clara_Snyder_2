@@ -30,9 +30,10 @@ const panelNavBackgrounds = {
   profile: "#f4f8ff",
   messages: "#f4f8ff"
 };
+const appHeightProperty = "--app-height";
 const knownMessageThreads = new Set([
-  "Brunch club",
-  "Crafting crew",
+  "Brunch Club",
+  "Crafting Crew",
   "Pickleball",
   "Maya",
   "Running club",
@@ -86,6 +87,43 @@ const detailParts = [
   "meeting up with people who share the same interest."
 ];
 const panelOrder = ["profile", "groups", "messages"];
+const skipSplashParam = "skipSplash";
+
+function isTextEntryFocused() {
+  const activeElement = document.activeElement;
+
+  if (page?.classList.contains("is-search-open") && activeElement?.tagName === "IFRAME") {
+    return true;
+  }
+
+  return Boolean(activeElement?.matches?.("input, textarea, [contenteditable='true']"));
+}
+
+function setStableAppHeight() {
+  document.documentElement.style.setProperty(appHeightProperty, `${window.innerHeight}px`);
+}
+
+function setupStableViewport() {
+  if ("virtualKeyboard" in navigator) {
+    try {
+      navigator.virtualKeyboard.overlaysContent = true;
+    } catch {
+      // Some mobile browsers expose the API without allowing control from file pages.
+    }
+  }
+
+  setStableAppHeight();
+  window.addEventListener("resize", () => {
+    if (!isTextEntryFocused()) {
+      setStableAppHeight();
+    }
+  });
+  window.visualViewport?.addEventListener("resize", () => {
+    if (!isTextEntryFocused()) {
+      setStableAppHeight();
+    }
+  });
+}
 
 function hideSplash() {
   if (!splashScreen) {
@@ -96,6 +134,42 @@ function hideSplash() {
   window.setTimeout(() => {
     splashScreen.classList.add("is-hidden");
   }, 760);
+}
+
+function shouldSkipSplash() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(skipSplashParam) === "1";
+}
+
+function cleanSkipSplashParam() {
+  const url = new URL(window.location.href);
+
+  if (!url.searchParams.has(skipSplashParam)) {
+    return;
+  }
+
+  url.searchParams.delete(skipSplashParam);
+  window.history.replaceState(null, "", url.toString());
+}
+
+function markCurrentEntryToSkipSplash() {
+  const url = new URL(window.location.href);
+  url.searchParams.set(skipSplashParam, "1");
+  window.history.replaceState(null, "", url.toString());
+}
+
+function startSplash() {
+  if (!splashScreen) {
+    return;
+  }
+
+  if (shouldSkipSplash()) {
+    splashScreen.classList.add("is-hidden");
+    cleanSkipSplashParam();
+    return;
+  }
+
+  window.setTimeout(hideSplash, 3200);
 }
 
 function getGroupPagePath() {
@@ -1012,6 +1086,8 @@ function setupGroupButtons() {
       }
 
       const group = getCardGroup(card);
+      markCurrentEntryToSkipSplash();
+
       const params = new URLSearchParams({
         title: group.title,
         members: group.members,
@@ -1024,6 +1100,7 @@ function setupGroupButtons() {
   });
 }
 
+setupStableViewport();
 renderCardTitles();
 renderCardPhotoDescriptions();
 setupCardPhotoSwipes();
@@ -1033,4 +1110,4 @@ renderPendingGroups();
 setupHeaderSearch();
 setupPanelSwipes();
 setupInitialPanelFromParams();
-window.setTimeout(hideSplash, 3200);
+startSplash();

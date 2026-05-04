@@ -51,6 +51,41 @@ let requestOverlayFadeTimeout = null;
 const pageParams = new URLSearchParams(window.location.search);
 const isEmbedded = pageParams.get("embedded") === "1";
 const shouldAutoFocus = pageParams.get("autofocus") === "1";
+const appHeightProperty = "--app-height";
+
+function isTextEntryFocused() {
+  const activeElement = document.activeElement;
+
+  return Boolean(activeElement?.matches?.("input, textarea, [contenteditable='true']"));
+}
+
+function setStableAppHeight() {
+  document.documentElement.style.setProperty(appHeightProperty, `${window.innerHeight}px`);
+}
+
+function setupStableViewport() {
+  if ("virtualKeyboard" in navigator) {
+    try {
+      navigator.virtualKeyboard.overlaysContent = true;
+    } catch {
+      // Some mobile browsers expose the API without allowing control from file pages.
+    }
+  }
+
+  setStableAppHeight();
+  window.addEventListener("resize", () => {
+    if (!isTextEntryFocused()) {
+      setStableAppHeight();
+      map.resize();
+    }
+  });
+  window.visualViewport?.addEventListener("resize", () => {
+    if (!isTextEntryFocused()) {
+      setStableAppHeight();
+      map.resize();
+    }
+  });
+}
 
 function runSearchSelection(query) {
   const selectedValue = toSearchLabel(query).trim();
@@ -784,6 +819,8 @@ function setupEmbeddedMode() {
     }
   });
 }
+
+setupStableViewport();
 
 map.once("load", () => {
   map.resize();
