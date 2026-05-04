@@ -65,6 +65,14 @@ function runSearchSelection(query) {
   searchInput.blur();
 }
 
+function requestEmbeddedSearchClose() {
+  if (!isEmbedded) {
+    return;
+  }
+
+  window.parent.postMessage({ type: "close-search-overlay" }, "*");
+}
+
 function readPendingTitles() {
   try {
     const stored = JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -453,7 +461,8 @@ function renderGroupMarkers(query, options = {}) {
     groupNode.className = "group-map-pin";
     groupNode.setAttribute("aria-label", `${results.cleanedQuery} group ${index + 1}`);
     groupNode.title = `${sentenceCase(results.cleanedQuery)} nearby`;
-    groupNode.addEventListener("click", () => {
+    groupNode.addEventListener("click", (event) => {
+      event.stopPropagation();
       openGroupSheet(group);
     });
 
@@ -633,6 +642,15 @@ groupSheet.addEventListener("click", (event) => {
   }
 
   closeGroupSheet();
+});
+
+map.on("click", () => {
+  if (inviteModal.classList.contains("is-open") || requestOverlay.classList.contains("is-open")) {
+    return;
+  }
+
+  closeGroupSheet();
+  requestEmbeddedSearchClose();
 });
 
 inviteModal.addEventListener("click", (event) => {

@@ -12,9 +12,12 @@ const groupId = params.get("groupId") || "";
 const groupCenterLat = params.get("centerLat") || "";
 const groupCenterLng = params.get("centerLng") || "";
 const activeProfile = params.get("profile") || "";
+const isSearchEmbedded = params.get("embedded") === "1";
 const groupDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
+
+document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded);
 
 const memberSeed = {
   "Brunch club": [
@@ -164,7 +167,12 @@ function applyPageTheme(title) {
     return;
   }
 
-  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(title));
+  const pageColor = getGroupPageColor(title);
+  pageElement.style.setProperty("--group-page-bg", pageColor);
+
+  if (isSearchEmbedded) {
+    window.parent.postMessage({ type: "set-shell-nav-background", color: pageColor }, "*");
+  }
 }
 
 function buildFallbackMembers(countText) {
@@ -273,6 +281,10 @@ function renderMembers() {
 
   if (groupCenterLng) {
     backParams.set("centerLng", groupCenterLng);
+  }
+
+  if (isSearchEmbedded) {
+    backParams.set("embedded", "1");
   }
 
   subtitle.textContent = `${members.length} members`;

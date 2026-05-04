@@ -53,47 +53,84 @@ body {
 }
 
 .hero-banner {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 3;
+  height: 88px;
+  background: var(--group-page-bg, var(--page-bg));
+}
+
+.is-search-embedded .hero-banner {
   display: none;
 }
 
-.hero-logo {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.hero-search-shell {
-  display: flex;
+.top-nav {
+  position: absolute;
+  top: 28px;
+  left: 6.9652%;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: center;
-  flex: 1;
-  height: 50px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(244, 248, 255, 0.94);
-  box-shadow: 0 10px 20px rgba(23, 36, 63, 0.1);
-  backdrop-filter: blur(10px);
+  width: 86.0697%;
+  height: 36px;
+  padding: 0;
 }
 
-.hero-search-input {
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  height: 100%;
-  border: 0;
-  background: transparent;
-  padding: 0 18px;
+  height: 36px;
+  border-radius: 999px;
   color: var(--text);
-  font: 500 16px/1.2 Inter, "Helvetica Neue", Arial, sans-serif;
-  outline: none;
+  font: 600 0.86rem/1 Inter, "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.hero-search-input::placeholder {
-  color: var(--muted);
+.nav-item:first-child {
+  justify-content: flex-start;
+}
+
+.nav-item:last-child {
+  justify-content: flex-end;
+}
+
+.nav-item-current {
+  color: var(--accent);
+}
+
+.nav-item:hover {
+  background: transparent;
+  transform: translateY(-1px);
+}
+
+.nav-item:active,
+.nav-item:focus-visible {
+  transform: scale(0.94);
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid rgba(100, 120, 255, 0.45);
+  outline-offset: 2px;
+}
+
+.nav-item:active {
+  opacity: 0.86;
 }
 
 .scroll-region {
   position: absolute;
   inset: 0;
   overflow-y: auto;
-  padding: 4.5rem 1.15rem 8rem;
+  padding: 6.4rem 1.15rem 2rem;
+}
+
+.is-search-embedded .scroll-region {
+  padding-top: 8rem;
 }
 
 .events-shell {
@@ -295,61 +332,6 @@ body {
 .event-meta-row span {
   color: var(--muted);
   font-weight: 600;
-}
-
-.bottom-nav {
-  position: absolute;
-  z-index: 3;
-  top: 86.7277%;
-  left: 6.9652%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 86.0697%;
-  height: 7.0938%;
-  padding: 0 2%;
-  border: 1px solid var(--line);
-  border-radius: 48px;
-  background: rgba(244, 248, 255, 0.94);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(12.5px);
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 12%;
-  height: 68%;
-  border-radius: 999px;
-  text-decoration: none;
-  transition: background-color 0.15s ease, transform 0.15s ease;
-}
-
-.nav-icon {
-  display: block;
-  max-width: 26px;
-  max-height: 26px;
-  width: auto;
-  height: auto;
-}
-
-.nav-item:hover {
-  background: rgba(220, 235, 255, 0.88);
-}
-
-.nav-item:active {
-  background: rgba(100, 120, 255, 0.18);
-  transform: scale(0.96);
-}
-
-.nav-item:focus-visible {
-  outline: 2px solid rgba(100, 120, 255, 0.45);
-  outline-offset: 2px;
-}
-
-.nav-item-active {
-  background: rgba(100, 120, 255, 0.22);
 }
 
 @media (max-width: 430px) {

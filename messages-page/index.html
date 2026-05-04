@@ -11,22 +11,17 @@
     <div class="phone-viewport">
       <main class="page">
         <header class="hero-banner">
-          <button class="hero-close-button" id="messages-close-button" type="button" aria-label="Close messages">
-            <img
-              class="hero-logo"
-              src="../assets/icons/messages.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </button>
+          <nav class="top-nav" aria-label="Top navigation">
+            <a class="nav-item" id="profile-nav-link" href="../my-groups-page/index.html">Profile</a>
+            <a class="nav-item" id="groups-nav-link" href="../homepage/index.html">My groups</a>
+            <a class="nav-item nav-item-current" href="#messages-list" aria-current="page">Messages</a>
+          </nav>
         </header>
 
-        <section class="messages-content" aria-label="Messages content">
-          <h1 class="messages-title">Messages</h1>
-
+        <section class="messages-content" id="messages-list" aria-label="Messages content">
           <section class="conversation-list" aria-label="Conversation list">
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-group"
               href="../group-text-page/index.html?title=Brunch%20club"
               aria-label="Open Brunch club messages"
             >
@@ -39,7 +34,7 @@
             </a>
 
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-group"
               href="../group-text-page/index.html?title=Crafting%20crew"
               aria-label="Open Crafting crew messages"
             >
@@ -52,7 +47,7 @@
             </a>
 
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-group"
               href="../group-text-page/index.html?title=Pickleball"
               aria-label="Open Pickleball messages"
             >
@@ -65,7 +60,7 @@
             </a>
 
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-direct"
               href="../group-text-page/index.html?title=Maya"
               aria-label="Open Maya messages"
             >
@@ -78,7 +73,7 @@
             </a>
 
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-group"
               href="../group-text-page/index.html?title=Running%20club"
               aria-label="Open Running club messages"
             >
@@ -91,7 +86,7 @@
             </a>
 
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-direct"
               href="../group-text-page/index.html?title=Jordan"
               aria-label="Open Jordan messages"
             >
@@ -104,7 +99,7 @@
             </a>
 
             <a
-              class="conversation-card conversation-link"
+              class="conversation-card conversation-link conversation-group"
               href="../group-text-page/index.html?title=Art%20walk"
               aria-label="Open Art walk messages"
             >

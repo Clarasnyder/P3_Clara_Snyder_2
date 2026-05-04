@@ -1,21 +1,24 @@
 const params = new URLSearchParams(window.location.search);
 const isEmbedded = params.get("embedded") === "1";
-const closeButton = document.getElementById("profile-close-button");
+const groupsNavLink = document.getElementById("groups-nav-link");
+const messagesNavLink = document.getElementById("messages-nav-link");
+
+document.documentElement.classList.toggle("is-embedded", isEmbedded);
 
 function setupEmbeddedMode() {
   if (isEmbedded) {
-    closeButton?.addEventListener("click", (event) => {
+    groupsNavLink?.addEventListener("click", (event) => {
       event.preventDefault();
       window.parent.postMessage({ type: "close-panel-overlay", panel: "profile" }, "*");
     });
-  } else {
-    closeButton?.addEventListener("click", (event) => {
+
+    messagesNavLink?.addEventListener("click", (event) => {
       event.preventDefault();
-      window.location.href = "../homepage/index.html";
+      window.parent.postMessage({ type: "close-panel-overlay", panel: "profile" }, "*");
+      window.parent.postMessage({ type: "open-panel-overlay", panel: "messages" }, "*");
     });
     return;
   }
-
 }
 
 setupEmbeddedMode();

@@ -12,9 +12,12 @@ const rawSearch = params.get("search") || "";
 const rawGroupId = params.get("groupId") || "";
 const rawCenterLat = params.get("centerLat") || "";
 const rawCenterLng = params.get("centerLng") || "";
+const isSearchEmbedded = params.get("embedded") === "1";
 const rawDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
+
+document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded);
 const groupPageColors = {
   "Brunch club": "#eef6ff",
   "Crafting crew": "#e3f2fb",
@@ -183,6 +186,10 @@ function buildBackParams() {
     backParams.set("centerLng", rawCenterLng);
   }
 
+  if (isSearchEmbedded) {
+    backParams.set("embedded", "1");
+  }
+
   return backParams;
 }
 
@@ -302,7 +309,12 @@ const eventData = getEventData();
 calendarMonth.textContent = eventData.month;
 backLink.href = `../group-page/index.html?${buildBackParams().toString()}`;
 if (pageElement) {
-  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(rawTitle));
+  const pageColor = getGroupPageColor(rawTitle);
+  pageElement.style.setProperty("--group-page-bg", pageColor);
+
+  if (isSearchEmbedded) {
+    window.parent.postMessage({ type: "set-shell-nav-background", color: pageColor }, "*");
+  }
 }
 renderCalendar(eventData.highlights);
 renderEvents(eventData.events);

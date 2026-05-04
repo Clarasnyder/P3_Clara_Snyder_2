@@ -7,7 +7,11 @@ const params = new URLSearchParams(window.location.search);
 const isEmbedded = params.get("embedded") === "1" || window.parent !== window;
 const returnTo = params.get("returnTo") || "";
 const backLink = document.querySelector(".back-link");
-const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+const profileNavLink = document.getElementById("profile-nav-link");
+const groupsNavLink = document.getElementById("groups-nav-link");
+const messagesNavLink = document.getElementById("messages-nav-link");
+
+document.documentElement.classList.toggle("is-embedded", isEmbedded);
 
 const conversationSeed = {
   "Brunch club": {
@@ -82,32 +86,22 @@ function setupEmbeddedMode() {
     return;
   }
 
-  const homeLink = navItems[0];
-  const messagesLink = navItems[1];
-  const searchLink = navItems[2];
-  const profileLink = navItems[3];
-
   if (!returnTo) {
     backLink?.setAttribute("href", "../messages-page/index.html?embedded=1");
   }
 
-  homeLink?.addEventListener("click", (event) => {
+  groupsNavLink?.addEventListener("click", (event) => {
     event.preventDefault();
     window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
   });
 
-  messagesLink?.addEventListener("click", (event) => {
+  messagesNavLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+  });
+
+  profileNavLink?.addEventListener("click", (event) => {
     event.preventDefault();
     window.parent.postMessage({ type: "close-panel-overlay", panel: "messages" }, "*");
-  });
-
-  searchLink?.addEventListener("click", (event) => {
-    event.preventDefault();
-    window.top.location.href = searchLink.getAttribute("href");
-  });
-
-  profileLink?.addEventListener("click", (event) => {
-    event.preventDefault();
     window.parent.postMessage({ type: "open-panel-overlay", panel: "profile" }, "*");
   });
 }

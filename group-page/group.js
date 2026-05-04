@@ -32,9 +32,12 @@ const rawGroupId = params.get("groupId") || "";
 const rawCenterLat = params.get("centerLat") || "";
 const rawCenterLng = params.get("centerLng") || "";
 const isEmbedded = params.get("embedded") === "1" || window.parent !== window;
+const isSearchEmbedded = params.get("embedded") === "1";
 const rawDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
+
+document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded);
 
 const backTargets = {
   search: "../search-page/index.html",
@@ -267,7 +270,12 @@ function applyPageTheme(title) {
     return;
   }
 
-  pageElement.style.setProperty("--group-page-bg", getGroupPageColor(title));
+  const pageColor = getGroupPageColor(title);
+  pageElement.style.setProperty("--group-page-bg", pageColor);
+
+  if (isSearchEmbedded) {
+    window.parent.postMessage({ type: "set-shell-nav-background", color: pageColor }, "*");
+  }
 }
 
 function getCheckinTasks(groupTitle) {
@@ -505,6 +513,10 @@ membersButton.addEventListener("click", () => {
     nextParams.set("centerLng", rawCenterLng);
   }
 
+  if (isSearchEmbedded) {
+    nextParams.set("embedded", "1");
+  }
+
   window.location.href = `../members-page/index.html?${nextParams.toString()}`;
 });
 
@@ -530,6 +542,10 @@ eventsButton.addEventListener("click", () => {
 
   if (rawCenterLng) {
     nextParams.set("centerLng", rawCenterLng);
+  }
+
+  if (isSearchEmbedded) {
+    nextParams.set("embedded", "1");
   }
 
   window.location.href = `../events-page/index.html?${nextParams.toString()}`;

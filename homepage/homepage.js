@@ -10,6 +10,7 @@ const searchOverlay = document.getElementById("search-overlay");
 const searchOverlayBackdrop = document.getElementById("search-overlay-backdrop");
 const searchOverlayFrame = document.getElementById("search-overlay-frame");
 const profileLauncher = document.getElementById("profile-launcher");
+const groupsLauncher = document.getElementById("groups-launcher");
 const messagesLauncher = document.getElementById("messages-launcher");
 const profileOverlay = document.getElementById("profile-overlay");
 const profileOverlayBackdrop = document.getElementById("profile-overlay-backdrop");
@@ -21,8 +22,13 @@ const page = document.querySelector(".page");
 let searchOverlayOpenedAt = 0;
 let embeddedSearchReady = false;
 let pendingEmbeddedSearch = "";
+let activePanel = "groups";
 const storageKey = "linkRequests";
 const defaultCenter = { lat: 35.9606, lng: -83.9207 };
+const panelNavBackgrounds = {
+  profile: "#f4f8ff",
+  messages: "#f4f8ff"
+};
 const seedSuggestions = [
   "pickleball",
   "hiking",
@@ -353,6 +359,7 @@ function collapseSearchOverlay() {
     return;
   }
 
+  resetShellNavBackground();
   searchOverlay.classList.add("is-open");
   searchOverlay.classList.remove("is-fullscreen");
   searchOverlay.setAttribute("aria-hidden", "false");
@@ -365,16 +372,24 @@ function openPanelOverlay(kind) {
   const overlay = isMessages ? messagesOverlay : profileOverlay;
   const frame = isMessages ? messagesOverlayFrame : profileOverlayFrame;
   const src = `${isMessages ? getMessagesPagePath() : getProfilePagePath()}?embedded=1`;
+  const otherOverlay = isMessages ? profileOverlay : messagesOverlay;
 
   if (!overlay || !frame) {
     return;
   }
+
+  setShellNavBackground(panelNavBackgrounds[kind]);
+  otherOverlay?.classList.remove("is-open");
+  otherOverlay?.setAttribute("aria-hidden", "true");
 
   if (frame.dataset.src !== src) {
     frame.src = src;
     frame.dataset.src = src;
   }
 
+  setActiveNav(kind);
+  page?.classList.toggle("is-panel-profile", kind === "profile");
+  page?.classList.toggle("is-panel-messages", kind === "messages");
   overlay.classList.add("is-open");
   overlay.setAttribute("aria-hidden", "false");
 }
@@ -388,6 +403,49 @@ function closePanelOverlay(kind) {
 
   overlay.classList.remove("is-open");
   overlay.setAttribute("aria-hidden", "true");
+
+  if (!profileOverlay?.classList.contains("is-open") && !messagesOverlay?.classList.contains("is-open")) {
+    page?.classList.remove("is-panel-profile", "is-panel-messages");
+    setActiveNav("groups");
+  }
+}
+
+function setActiveNav(kind) {
+  activePanel = kind;
+  const navItems = [
+    { element: profileLauncher, panel: "profile" },
+    { element: groupsLauncher, panel: "groups" },
+    { element: messagesLauncher, panel: "messages" }
+  ];
+
+  navItems.forEach(({ element, panel }) => {
+    if (!element) {
+      return;
+    }
+
+    const isCurrent = panel === activePanel;
+    element.classList.toggle("nav-item-current", isCurrent);
+
+    if (isCurrent) {
+      element.setAttribute("aria-current", "page");
+      return;
+    }
+
+    element.removeAttribute("aria-current");
+  });
+}
+
+function setShellNavBackground(color = "") {
+  if (color) {
+    page?.style.setProperty("--shell-nav-bg", color);
+    return;
+  }
+
+  resetShellNavBackground();
+}
+
+function resetShellNavBackground() {
+  page?.style.removeProperty("--shell-nav-bg");
 }
 
 function sendEmbeddedSearch(query) {
@@ -417,6 +475,7 @@ function closeSearchOverlay() {
     return;
   }
 
+  resetShellNavBackground();
   searchOverlay.classList.remove("is-open");
   searchOverlay.setAttribute("aria-hidden", "true");
   searchOverlay.classList.remove("is-fullscreen");
@@ -484,14 +543,15 @@ function setupHeaderSearch() {
     openPanelOverlay("profile");
   });
 
+  groupsLauncher?.addEventListener("click", (event) => {
+    event.preventDefault();
+    resetShellNavBackground();
+    closePanelOverlay("profile");
+    closePanelOverlay("messages");
+  });
+
   messagesLauncher?.addEventListener("click", (event) => {
     event.preventDefault();
-
-    if (messagesOverlay?.classList.contains("is-open")) {
-      closePanelOverlay("messages");
-      return;
-    }
-
     openPanelOverlay("messages");
   });
 
@@ -516,6 +576,16 @@ function setupHeaderSearch() {
 
     if (event.data?.type === "collapse-search-overlay") {
       collapseSearchOverlay();
+      return;
+    }
+
+    if (event.data?.type === "set-shell-nav-background") {
+      setShellNavBackground(event.data.color);
+      return;
+    }
+
+    if (event.data?.type === "reset-shell-nav-background") {
+      resetShellNavBackground();
       return;
     }
 

@@ -11,17 +11,14 @@
     <div class="phone-viewport">
       <main class="page">
         <header class="hero-banner">
-          <button class="hero-close-button" id="profile-close-button" type="button" aria-label="Close profile">
-            <img
-              class="hero-logo"
-              src="../assets/icons/person.svg"
-              alt=""
-              aria-hidden="true"
-            />
-          </button>
+          <nav class="top-nav" aria-label="Top navigation">
+            <a class="nav-item nav-item-current" href="#profile-content" aria-current="page">Profile</a>
+            <a class="nav-item" id="groups-nav-link" href="../homepage/index.html">My groups</a>
+            <a class="nav-item" id="messages-nav-link" href="../messages-page/index.html">Messages</a>
+          </nav>
         </header>
 
-        <section class="groups-content" aria-label="Profile content">
+        <section class="groups-content" id="profile-content" aria-label="Profile content">
           <section class="account-card" aria-label="Account information">
             <div class="account-avatar" aria-hidden="true">CS</div>
             <div class="account-copy">
