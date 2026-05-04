@@ -236,8 +236,9 @@ body {
   position: absolute;
   inset: auto 0 0 0;
   z-index: 5;
-  height: 50%;
-  padding: 14px 22px 28px;
+  min-height: 58%;
+  max-height: 72%;
+  padding: 14px 22px max(34px, calc(env(safe-area-inset-bottom) + 28px));
   border-radius: 32px 32px 0 0;
   border-top: 1.5px solid var(--line);
   background: var(--page-bg);
@@ -262,7 +263,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: calc(100% - 20px);
+  min-height: calc(100% - 20px);
   padding: 10px 12px 0;
   text-align: center;
 }
@@ -316,7 +317,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  margin-top: auto;
+  margin-top: 24px;
 }
 
 .group-sheet-action {
@@ -677,6 +678,12 @@ body.is-embedded .map-frame .maplibregl-ctrl-bottom-right {
 
   .hero-banner {
     position: fixed;
+  }
+
+  .group-sheet {
+    min-height: 62%;
+    max-height: 78%;
+    padding-bottom: max(56px, calc(env(safe-area-inset-bottom) + 42px));
   }
 
   .page {
