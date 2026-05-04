@@ -265,12 +265,14 @@ body {
 .bottom-search-dock {
   position: absolute;
   z-index: 7;
+  top: auto;
   left: 6.9652%;
   bottom: 5.7%;
   display: flex;
   align-items: center;
   width: 86.0697%;
   transition:
+    top 0.32s ease,
     bottom 0.32s ease,
     transform 0.34s cubic-bezier(0.2, 0.88, 0.24, 1);
 }
@@ -333,7 +335,8 @@ body {
 }
 
 .page.is-search-open .bottom-search-dock {
-  bottom: calc(100% - 104px - 86px);
+  top: 140px;
+  bottom: auto;
 }
 
 .page.is-search-fullscreen .bottom-search-dock {
@@ -768,6 +771,14 @@ body {
 }
 
 @media (max-width: 430px) {
+  html,
+  body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--app-height, 100svh);
+  }
+
   body {
     padding: 0;
     background: #ffffff;

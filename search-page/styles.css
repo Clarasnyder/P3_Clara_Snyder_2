@@ -653,6 +653,14 @@ body.is-embedded .map-frame .maplibregl-ctrl-bottom-right {
 }
 
 @media (max-width: 430px) {
+  html,
+  body {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: var(--app-height, 100svh);
+  }
+
   body {
     padding: 0;
     background: #ffffff;
