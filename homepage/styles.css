@@ -91,9 +91,24 @@ body {
 .splash-icon {
   width: 82px;
   height: 82px;
-  filter: invert(1) brightness(1.8);
-  opacity: 0.94;
-  animation: splash-link-pulse 1.6s ease-in-out infinite;
+  overflow: visible;
+}
+
+.splash-icon-fill {
+  fill: #f4f8ff;
+  opacity: 0;
+  animation: splash-link-fill-fade 1.6s ease-in-out infinite;
+}
+
+.splash-icon-stroke {
+  fill: none;
+  stroke: #f4f8ff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 410;
+  stroke-dashoffset: 410;
+  animation: splash-link-draw 1.6s ease-in-out infinite;
 }
 
 .splash-title {
@@ -690,9 +705,35 @@ body {
   width: 0;
 }
 
-@keyframes splash-link-pulse {
+@keyframes splash-link-draw {
   0% {
-    opacity: 0.24;
+    stroke-dashoffset: 410;
+    opacity: 0.3;
+  }
+
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  70% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: -410;
+    opacity: 0.3;
+  }
+}
+
+@keyframes splash-link-fill-fade {
+  0% {
+    opacity: 0;
+  }
+
+  34% {
+    opacity: 0;
   }
 
   48% {
@@ -704,16 +745,25 @@ body {
   }
 
   100% {
-    opacity: 0.24;
+    opacity: 0.12;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .splash-screen,
   .splash-mark,
-  .splash-icon {
+  .splash-icon-fill,
+  .splash-icon-stroke {
     animation: none;
     transition: none;
+  }
+
+  .splash-icon-fill {
+    opacity: 1;
+  }
+
+  .splash-icon-stroke {
+    opacity: 0;
   }
 }
 
