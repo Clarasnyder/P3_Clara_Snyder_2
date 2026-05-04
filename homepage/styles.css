@@ -58,6 +58,67 @@ body {
   background: var(--page-bg);
 }
 
+.splash-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: #17243f;
+  color: #f4f8ff;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.72s ease,
+    visibility 0s linear 0.72s;
+}
+
+.splash-mark {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  transform: translateY(0);
+  transition: transform 0.72s ease;
+}
+
+.splash-icon-shell {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+}
+
+.splash-icon {
+  width: 82px;
+  height: 82px;
+  filter: invert(1) brightness(1.8);
+  opacity: 0.94;
+  animation: splash-link-pulse 1.6s ease-in-out infinite;
+}
+
+.splash-title {
+  width: 100%;
+  margin: 0;
+  color: #f4f8ff;
+  font: 400 60px/1 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.splash-screen.is-fading {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-screen.is-fading .splash-mark {
+  transform: translateY(-8px);
+}
+
+.splash-screen.is-hidden {
+  display: none;
+}
+
 .hero-banner {
   position: absolute;
   z-index: 12;
@@ -627,6 +688,33 @@ body {
 
 .scroll-region::-webkit-scrollbar {
   width: 0;
+}
+
+@keyframes splash-link-pulse {
+  0% {
+    opacity: 0.24;
+  }
+
+  48% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.24;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen,
+  .splash-mark,
+  .splash-icon {
+    animation: none;
+    transition: none;
+  }
 }
 
 @media (max-width: 430px) {

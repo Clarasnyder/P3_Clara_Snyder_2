@@ -19,6 +19,7 @@ const messagesOverlay = document.getElementById("messages-overlay");
 const messagesOverlayBackdrop = document.getElementById("messages-overlay-backdrop");
 const messagesOverlayFrame = document.getElementById("messages-overlay-frame");
 const page = document.querySelector(".page");
+const splashScreen = document.getElementById("splash-screen");
 let searchOverlayOpenedAt = 0;
 let embeddedSearchReady = false;
 let pendingEmbeddedSearch = "";
@@ -85,6 +86,17 @@ const detailParts = [
   "meeting up with people who share the same interest."
 ];
 const panelOrder = ["profile", "groups", "messages"];
+
+function hideSplash() {
+  if (!splashScreen) {
+    return;
+  }
+
+  splashScreen.classList.add("is-fading");
+  window.setTimeout(() => {
+    splashScreen.classList.add("is-hidden");
+  }, 760);
+}
 
 function getGroupPagePath() {
   return window.location.pathname.includes("/homepage/")
@@ -732,11 +744,22 @@ function setupPanelSwipes() {
   let startX = 0;
   let startY = 0;
   let pointerId = null;
+  let wheelDeltaX = 0;
+  let wheelResetTimeout = null;
 
   const ignoredSwipeTarget = (target) =>
     target?.closest?.(
       "a, button, input, textarea, select, .search-area, .search-overlay, .panel-overlay, .card-photo-shell-swipeable"
     );
+
+  const resetWheelSwipe = () => {
+    wheelDeltaX = 0;
+
+    if (wheelResetTimeout) {
+      window.clearTimeout(wheelResetTimeout);
+      wheelResetTimeout = null;
+    }
+  };
 
   page.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) {
@@ -771,6 +794,35 @@ function setupPanelSwipes() {
   page.addEventListener("pointercancel", () => {
     pointerId = null;
   });
+
+  page.addEventListener(
+    "wheel",
+    (event) => {
+      if (page.classList.contains("is-search-open") || ignoredSwipeTarget(event.target)) {
+        return;
+      }
+
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY) * 1.35) {
+        return;
+      }
+
+      event.preventDefault();
+      wheelDeltaX += event.deltaX;
+
+      if (Math.abs(wheelDeltaX) >= 72) {
+        navigateRelativePanel(wheelDeltaX > 0 ? 1 : -1);
+        resetWheelSwipe();
+        return;
+      }
+
+      if (wheelResetTimeout) {
+        window.clearTimeout(wheelResetTimeout);
+      }
+
+      wheelResetTimeout = window.setTimeout(resetWheelSwipe, 180);
+    },
+    { passive: false }
+  );
 }
 
 function setupInitialPanelFromParams() {
@@ -981,3 +1033,4 @@ renderPendingGroups();
 setupHeaderSearch();
 setupPanelSwipes();
 setupInitialPanelFromParams();
+window.setTimeout(hideSplash, 3200);

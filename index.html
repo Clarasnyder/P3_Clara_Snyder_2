@@ -222,14 +222,6 @@
 
     <script>
       const splashScreen = document.getElementById("splash-screen");
-      const splashStorageKey = "linkSplashSeen";
-      let shouldShowSplash = true;
-
-      try {
-        shouldShowSplash = sessionStorage.getItem(splashStorageKey) !== "true";
-      } catch (error) {
-        shouldShowSplash = true;
-      }
 
       function hideSplash() {
         if (!splashScreen) {
@@ -242,17 +234,7 @@
         }, 760);
       }
 
-      if (!shouldShowSplash) {
-        splashScreen?.classList.add("is-hidden");
-      } else {
-        try {
-          sessionStorage.setItem(splashStorageKey, "true");
-        } catch (error) {
-          // The animation can still run if storage is unavailable.
-        }
-
-        window.setTimeout(hideSplash, 3200);
-      }
+      window.setTimeout(hideSplash, 3200);
     </script>
   </body>
 </html>

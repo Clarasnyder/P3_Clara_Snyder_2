@@ -17,6 +17,8 @@ function setupEmbeddedPanelSwipes() {
   let startX = 0;
   let startY = 0;
   let pointerId = null;
+  let wheelDeltaX = 0;
+  let wheelResetTimeout = null;
 
   const handleSwipeEnd = (endX, endY) => {
     const deltaX = endX - startX;
@@ -27,6 +29,15 @@ function setupEmbeddedPanelSwipes() {
     }
 
     postPanelNavigation(deltaX < 0 ? "groups" : "profile");
+  };
+
+  const resetWheelSwipe = () => {
+    wheelDeltaX = 0;
+
+    if (wheelResetTimeout) {
+      window.clearTimeout(wheelResetTimeout);
+      wheelResetTimeout = null;
+    }
   };
 
   document.addEventListener(
@@ -80,6 +91,31 @@ function setupEmbeddedPanelSwipes() {
   document.addEventListener("pointercancel", () => {
     pointerId = null;
   });
+
+  document.addEventListener(
+    "wheel",
+    (event) => {
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY) * 1.35) {
+        return;
+      }
+
+      event.preventDefault();
+      wheelDeltaX += event.deltaX;
+
+      if (Math.abs(wheelDeltaX) >= 72) {
+        postPanelNavigation(wheelDeltaX > 0 ? "groups" : "profile");
+        resetWheelSwipe();
+        return;
+      }
+
+      if (wheelResetTimeout) {
+        window.clearTimeout(wheelResetTimeout);
+      }
+
+      wheelResetTimeout = window.setTimeout(resetWheelSwipe, 180);
+    },
+    { passive: false }
+  );
 }
 
 function setupEmbeddedMode() {
