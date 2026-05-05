@@ -708,9 +708,8 @@ function closeSearchOverlay() {
   pendingEmbeddedSearch = "";
 
   if (searchOverlayFrame) {
-    const resetUrl = buildEmbeddedSearchUrl();
-    searchOverlayFrame.src = resetUrl;
-    searchOverlayFrame.dataset.src = resetUrl;
+    searchOverlayFrame.removeAttribute("src");
+    delete searchOverlayFrame.dataset.src;
   }
 
   if (searchInput) {
