@@ -3,6 +3,7 @@ const isEmbedded = params.get("embedded") === "1";
 const groupsNavLink = document.getElementById("groups-nav-link");
 const messagesNavLink = document.getElementById("messages-nav-link");
 const editProfileButton = document.getElementById("edit-profile-button");
+const logoutButton = document.getElementById("logout-button");
 const accountAvatar = document.getElementById("account-avatar");
 const accountName = document.getElementById("account-name");
 const accountHandle = document.getElementById("account-handle");
@@ -160,6 +161,14 @@ function setupEditProfileButton() {
   });
 }
 
+function setupLogoutButton() {
+  logoutButton?.addEventListener("click", () => {
+    const loginUrl = new URL("../index.html?login=1", window.location.href);
+
+    window.top.location.href = loginUrl.toString();
+  });
+}
+
 function getInitials(name) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
 
@@ -202,3 +211,4 @@ renderProfile();
 setupEmbeddedMode();
 setupEmbeddedPanelSwipes();
 setupEditProfileButton();
+setupLogoutButton();

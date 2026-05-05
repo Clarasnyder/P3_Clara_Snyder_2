@@ -401,7 +401,7 @@
     </style>
   </head>
   <body>
-    <iframe class="home-frame" src="./homepage/index.html" title="Link home"></iframe>
+    <iframe class="home-frame" id="home-frame" src="./homepage/index.html" title="Link home"></iframe>
 
     <section class="splash-screen" id="splash-screen" aria-label="Link loading screen">
       <div class="splash-mark" aria-hidden="true">
@@ -469,6 +469,9 @@
       const loginUsername = document.getElementById("login-username");
       const loginPassword = document.getElementById("login-password");
       const loginError = document.getElementById("login-error");
+      const homeFrame = document.getElementById("home-frame");
+      const pageParams = new URLSearchParams(window.location.search);
+      const shouldShowLoginOnly = pageParams.get("login") === "1";
       let stableAppHeight = window.innerHeight;
 
       function isTextEntryFocused() {
@@ -494,6 +497,29 @@
         loginError?.classList.remove("is-visible");
       }
 
+      function showLoginOnly() {
+        if (homeFrame) {
+          homeFrame.src = "./homepage/index.html?skipSplash=1";
+        }
+
+        loginScreen?.classList.remove("is-hidden", "is-complete");
+        loginScreen?.classList.add("is-open");
+        splashScreen?.classList.remove("is-complete", "is-hidden");
+        splashScreen?.classList.add("is-fading", "is-settled");
+        loginUsername?.focus();
+      }
+
+      function cleanLoginParam() {
+        if (!pageParams.has("login")) {
+          return;
+        }
+
+        const url = new URL(window.location.href);
+
+        url.searchParams.delete("login");
+        window.history.replaceState(null, "", url.toString());
+      }
+
       function hideSplash() {
         if (!splashScreen) {
           return;
@@ -516,7 +542,7 @@
 
         if (username === "clarasnyder" && password === "password") {
           loginError.classList.remove("is-visible");
-          localStorage.removeItem("linkProfile");
+          cleanLoginParam();
           splashScreen.classList.add("is-complete");
           loginScreen.classList.add("is-complete");
           loginScreen.classList.remove("is-open");
@@ -542,12 +568,20 @@
       window.addEventListener("resize", () => setStableAppHeight());
       window.visualViewport?.addEventListener("resize", () => setStableAppHeight());
       resetLoginIntroState();
-      window.setTimeout(hideSplash, 3200);
+      if (shouldShowLoginOnly) {
+        showLoginOnly();
+      } else {
+        window.setTimeout(hideSplash, 3200);
+      }
 
       window.addEventListener("pageshow", (event) => {
         if (event.persisted) {
           resetLoginIntroState();
-          window.setTimeout(hideSplash, 3200);
+          if (shouldShowLoginOnly) {
+            showLoginOnly();
+          } else {
+            window.setTimeout(hideSplash, 3200);
+          }
         }
       });
     </script>

@@ -252,6 +252,33 @@ body {
   outline-offset: 3px;
 }
 
+.logout-button {
+  display: block;
+  margin: 12px auto 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: 400 14px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  color: #5163dc;
+}
+
+.logout-button:active {
+  color: #4353b8;
+}
+
+.logout-button:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid rgba(100, 120, 255, 0.45);
+  outline-offset: 3px;
+}
+
 .pending-shell {
   display: grid;
   gap: 12px;
