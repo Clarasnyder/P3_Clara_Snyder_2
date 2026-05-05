@@ -1,4 +1,5 @@
 const searchInput = document.getElementById("search-input");
+const searchPill = document.querySelector(".search-pill");
 const dropdown = document.getElementById("search-dropdown");
 const suggestionsRoot = document.getElementById("search-suggestions");
 const mapFrame = document.getElementById("map-frame");
@@ -144,6 +145,14 @@ function requestEmbeddedSearchClose() {
   }
 
   window.parent.postMessage({ type: "close-search-overlay" }, "*");
+}
+
+function focusSearchInput() {
+  try {
+    searchInput.focus({ preventScroll: true });
+  } catch {
+    searchInput.focus();
+  }
 }
 
 function readPendingTitles() {
@@ -760,6 +769,11 @@ searchInput.addEventListener("input", () => {
   renderSuggestions(suggestions);
   dropdown.classList.remove("is-hidden");
 });
+
+searchPill?.addEventListener("pointerup", focusSearchInput);
+searchPill?.addEventListener("click", focusSearchInput);
+searchInput.addEventListener("pointerup", focusSearchInput);
+searchInput.addEventListener("click", focusSearchInput);
 
 searchInput.addEventListener("focus", () => {
   const suggestions = buildSuggestions(searchInput.value);
