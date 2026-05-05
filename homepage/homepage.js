@@ -24,7 +24,6 @@ let searchOverlayOpenedAt = 0;
 let embeddedSearchReady = false;
 let pendingEmbeddedSearch = "";
 let activePanel = "groups";
-let searchOverlaySettleTimeout = null;
 const storageKey = "linkRequests";
 const defaultCenter = { lat: 35.9606, lng: -83.9207 };
 const panelNavBackgrounds = {
@@ -265,7 +264,8 @@ function buildMessageThreadUrl(title = "Message", returnTo = "") {
 
 function buildEmbeddedSearchUrl(query = "") {
   const params = new URLSearchParams({
-    embedded: "1"
+    embedded: "1",
+    autofocus: "1"
   });
 
   if (query.trim()) {
@@ -489,7 +489,7 @@ function openSearchOverlay(query = "") {
     return;
   }
 
-  searchOverlay.classList.remove("is-fullscreen", "is-settled");
+  searchOverlay.classList.remove("is-fullscreen");
   page?.classList.remove("is-search-fullscreen");
 
   const nextUrl = buildEmbeddedSearchUrl(query);
@@ -505,14 +505,6 @@ function openSearchOverlay(query = "") {
   searchOverlay.classList.add("is-open");
   searchOverlay.setAttribute("aria-hidden", "false");
   page?.classList.add("is-search-open");
-
-  if (searchOverlaySettleTimeout) {
-    window.clearTimeout(searchOverlaySettleTimeout);
-  }
-
-  searchOverlaySettleTimeout = window.setTimeout(() => {
-    searchOverlay.classList.add("is-settled");
-  }, 420);
 }
 
 function expandSearchOverlay() {
@@ -520,7 +512,7 @@ function expandSearchOverlay() {
     return;
   }
 
-  searchOverlay.classList.add("is-open", "is-fullscreen", "is-settled");
+  searchOverlay.classList.add("is-open", "is-fullscreen");
   searchOverlay.setAttribute("aria-hidden", "false");
   page?.classList.add("is-search-open", "is-search-fullscreen");
 }
@@ -532,18 +524,11 @@ function collapseSearchOverlay() {
 
   resetShellNavBackground();
   searchOverlay.classList.add("is-open");
-  searchOverlay.classList.remove("is-fullscreen", "is-settled");
+  searchOverlay.classList.remove("is-fullscreen");
   searchOverlay.setAttribute("aria-hidden", "false");
   page?.classList.add("is-search-open");
   page?.classList.remove("is-search-fullscreen");
 
-  if (searchOverlaySettleTimeout) {
-    window.clearTimeout(searchOverlaySettleTimeout);
-  }
-
-  searchOverlaySettleTimeout = window.setTimeout(() => {
-    searchOverlay.classList.add("is-settled");
-  }, 420);
 }
 
 function openPanelOverlay(kind, overrideSrc = "") {
@@ -715,17 +700,12 @@ function closeSearchOverlay() {
   }
 
   resetShellNavBackground();
-  searchOverlay.classList.remove("is-open", "is-settled");
+  searchOverlay.classList.remove("is-open");
   searchOverlay.setAttribute("aria-hidden", "true");
   searchOverlay.classList.remove("is-fullscreen");
   page?.classList.remove("is-search-open", "is-search-fullscreen");
   embeddedSearchReady = false;
   pendingEmbeddedSearch = "";
-
-  if (searchOverlaySettleTimeout) {
-    window.clearTimeout(searchOverlaySettleTimeout);
-    searchOverlaySettleTimeout = null;
-  }
 
   if (searchOverlayFrame) {
     const resetUrl = buildEmbeddedSearchUrl();
@@ -746,9 +726,13 @@ function setupHeaderSearch() {
     return;
   }
 
+  searchInput.addEventListener("pointerdown", () => {
+    openSearchOverlay();
+    window.scrollTo(0, 0);
+  });
+
   searchInput.addEventListener("focus", () => {
     openSearchOverlay();
-    searchInput.blur();
 
     const suggestions = buildSuggestions(searchInput.value);
 
@@ -760,7 +744,6 @@ function setupHeaderSearch() {
 
   searchInput.addEventListener("click", () => {
     openSearchOverlay();
-    searchInput.blur();
   });
 
   searchInput.addEventListener("input", () => {

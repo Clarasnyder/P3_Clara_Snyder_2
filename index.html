@@ -18,6 +18,7 @@
       }
 
       :root {
+        --app-height: 100dvh;
         --app-shell-bg: #cfe3fb;
         --splash-bg: #17243f;
         --splash-text: #f4f8ff;
@@ -43,7 +44,7 @@
       .home-frame {
         display: block;
         width: 100vw;
-        height: 100dvh;
+        height: var(--app-height, 100dvh);
         border: 0;
         background: var(--app-shell-bg);
       }
@@ -468,6 +469,24 @@
       const loginUsername = document.getElementById("login-username");
       const loginPassword = document.getElementById("login-password");
       const loginError = document.getElementById("login-error");
+      let stableAppHeight = window.innerHeight;
+
+      function isTextEntryFocused() {
+        const activeElement = document.activeElement;
+
+        return Boolean(activeElement?.matches?.("input, textarea, [contenteditable='true']")) || activeElement?.tagName === "IFRAME";
+      }
+
+      function setStableAppHeight(force = false) {
+        const visualHeight = window.visualViewport?.height || window.innerHeight;
+        const keyboardLikelyOpen = isTextEntryFocused() && visualHeight < stableAppHeight * 0.86;
+
+        if (force || !keyboardLikelyOpen) {
+          stableAppHeight = window.innerHeight;
+        }
+
+        document.documentElement.style.setProperty("--app-height", `${stableAppHeight}px`);
+      }
 
       function resetLoginIntroState() {
         splashScreen?.classList.remove("is-fading", "is-settled", "is-complete", "is-hidden");
@@ -511,6 +530,17 @@
         loginError.classList.add("is-visible");
       });
 
+      if ("virtualKeyboard" in navigator) {
+        try {
+          navigator.virtualKeyboard.overlaysContent = true;
+        } catch {
+          // Some mobile browsers expose this but ignore control from regular pages.
+        }
+      }
+
+      setStableAppHeight(true);
+      window.addEventListener("resize", () => setStableAppHeight());
+      window.visualViewport?.addEventListener("resize", () => setStableAppHeight());
       resetLoginIntroState();
       window.setTimeout(hideSplash, 3200);
 

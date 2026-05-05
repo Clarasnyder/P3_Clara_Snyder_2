@@ -343,10 +343,6 @@ body {
   transform: translateY(0);
 }
 
-.search-overlay.is-settled .search-overlay-panel {
-  transform: none;
-}
-
 .search-overlay.is-fullscreen .search-overlay-panel {
   top: 0;
   border-radius: 0;
