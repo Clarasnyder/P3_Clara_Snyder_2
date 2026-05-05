@@ -71,11 +71,6 @@
               </div>
 
               <div class="camera-frame" id="camera-frame" aria-label="Camera preview">
-                <span class="camera-live">Live</span>
-                <span class="camera-corner camera-corner-top-left"></span>
-                <span class="camera-corner camera-corner-top-right"></span>
-                <span class="camera-corner camera-corner-bottom-left"></span>
-                <span class="camera-corner camera-corner-bottom-right"></span>
                 <video class="camera-video" id="camera-video" autoplay playsinline muted></video>
                 <canvas class="camera-canvas" id="camera-canvas" hidden></canvas>
                 <p class="camera-error" id="camera-error"></p>
@@ -84,10 +79,16 @@
 
               <div class="camera-actions" id="camera-actions">
                 <button class="camera-shutter" id="camera-shutter-button" type="button" aria-label="Take photo"></button>
-                <button class="checkin-primary camera-submit" id="camera-submit-button" type="button" disabled>
-                  Submit check-in
-                </button>
               </div>
+
+              <section class="proof-confirmation" id="proof-confirmation" aria-hidden="true">
+                <div class="proof-confirmation-card">
+                  <div class="proof-confirmation-actions">
+                    <button class="proof-retake-button" id="proof-retake-button" type="button">Retake</button>
+                    <button class="proof-submit-button" id="proof-submit-button" type="button">Submit</button>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
         </section>

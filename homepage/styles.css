@@ -10,10 +10,13 @@
 :root {
   --screen-width: 402px;
   --screen-height: 874px;
-  --page-bg: #f4f8ff;
+  --page-bg: #dcebff;
   --hero-bg: #17243f;
   --card-bg: #dcebff;
   --card-bg-alt: #dff478;
+  --card-bg-social: #9fc4ff;
+  --card-bg-physical: #f1ffc5;
+  --card-bg-educational: #2f4f9a;
   --surface-bg: #eef4ff;
   --accent: #6478ff;
   --accent-soft: #dff478;
@@ -39,8 +42,8 @@ body {
   display: grid;
   place-items: center;
   padding: 16px;
-  background: #dcebff;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  background: #cfe3fb;
+  font-family: "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .phone-viewport {
@@ -150,6 +153,18 @@ body {
 .page.is-search-open:not(.is-shell-group-page) .hero-banner {
   background: transparent;
   backdrop-filter: none;
+}
+
+.page.is-shell-dark-group .hero-banner {
+  background: var(--shell-nav-bg, var(--page-bg));
+}
+
+.page.is-shell-dark-group .nav-item {
+  color: #eef4ff;
+}
+
+.page.is-shell-dark-group .nav-item-current {
+  color: #dbe6ff;
 }
 
 .top-nav {
@@ -501,6 +516,10 @@ body {
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
+.card-four .card-photo {
+  object-position: center 30%;
+}
+
 .card-photo-description {
   position: absolute;
   inset: 0;
@@ -595,22 +614,32 @@ body {
 
 .card-one {
   top: 17%;
+  background: var(--card-bg-social);
 }
 
 .card-two {
   top: 74.6659%;
-  background: var(--card-bg);
+  background: var(--card-bg-social);
 }
 
 .card-three {
   top: 132.3318%;
-  background: var(--card-bg);
+  background: var(--card-bg-physical);
   border-radius: 24px;
+}
+
+.card-four {
+  top: 189.9977%;
+  background: var(--card-bg-educational);
+}
+
+.card-four .card-title {
+  color: #eef4ff;
 }
 
 .pending-links-shell {
   position: absolute;
-  top: 189.1636%;
+  top: 246.8295%;
   left: 6.7164%;
   width: 86.3184%;
   display: grid;

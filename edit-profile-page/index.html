@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="edit-profile.js" defer></script>
+  </head>
+  <body>
+    <div class="phone-viewport">
+      <main class="page">
+        <header class="hero-banner">
+          <nav class="top-nav" aria-label="Top navigation">
+            <a class="nav-item nav-item-current" href="../my-groups-page/index.html" aria-current="page">Profile</a>
+            <a class="nav-item" id="groups-nav-link" href="../homepage/index.html?skipSplash=1">My groups</a>
+            <a class="nav-item" id="messages-nav-link" href="../messages-page/index.html">Messages</a>
+          </nav>
+        </header>
+
+        <section class="edit-content" aria-label="Edit profile content">
+          <header class="edit-header">
+            <a class="back-link" id="back-link" href="../my-groups-page/index.html" aria-label="Back to profile">
+              <span class="back-chevron" aria-hidden="true"></span>
+            </a>
+            <div>
+              <h1 class="edit-title">Edit profile</h1>
+              <p class="edit-subtitle">Clara Snyder</p>
+            </div>
+          </header>
+
+          <form class="profile-form" id="profile-form">
+            <div class="avatar-field">
+              <div class="avatar-preview" id="avatar-preview" aria-hidden="true">CS</div>
+              <button class="avatar-button" id="avatar-button" type="button">Change photo</button>
+            </div>
+
+            <label class="field-label">
+              Name
+              <input class="field-input" id="name-input" type="text" value="Clara Snyder" autocomplete="name" />
+            </label>
+
+            <label class="field-label">
+              Handle
+              <input class="field-input" id="handle-input" type="text" value="@clarasnyder" autocomplete="username" />
+            </label>
+
+            <label class="field-label">
+              Location
+              <input class="field-input" id="location-input" type="text" value="Knoxville, Tennessee" autocomplete="address-level2" />
+            </label>
+
+            <label class="field-label">
+              Bio
+              <textarea class="field-input field-textarea" id="bio-input" rows="4">Into brunch plans, creative projects, and meeting new people around town.</textarea>
+            </label>
+
+            <button class="save-button" type="submit">Save profile</button>
+          </form>
+        </section>
+
+        <section class="photo-camera-overlay" id="photo-camera-overlay" aria-hidden="true">
+          <div class="photo-camera-panel" role="dialog" aria-label="Take profile photo">
+            <div class="photo-camera-header">
+              <div>
+                <p class="photo-camera-kicker">Profile photo</p>
+                <h2 class="photo-camera-title">Take photo</h2>
+              </div>
+              <button class="photo-camera-close" id="photo-camera-close" type="button">Done</button>
+            </div>
+
+            <div class="photo-camera-frame" id="photo-camera-frame" aria-label="Camera preview">
+              <video class="photo-camera-video" id="photo-camera-video" autoplay playsinline muted></video>
+              <canvas class="photo-camera-canvas" id="photo-camera-canvas" hidden></canvas>
+              <p class="photo-camera-error" id="photo-camera-error"></p>
+              <p class="photo-camera-status" id="photo-camera-status">Opening camera</p>
+            </div>
+
+            <div class="photo-camera-actions">
+              <button class="photo-camera-shutter" id="photo-camera-shutter" type="button" aria-label="Take profile photo"></button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -13,6 +13,7 @@ const groupCenterLat = params.get("centerLat") || "";
 const groupCenterLng = params.get("centerLng") || "";
 const activeProfile = params.get("profile") || "";
 const isSearchEmbedded = params.get("embedded") === "1";
+const directConversationsStorageKey = "linkDirectConversations";
 const groupDescription =
   params.get("description") ||
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
@@ -40,6 +41,13 @@ const memberSeed = {
     { name: "Aiden", age: 26 },
     { name: "Mila", age: 24 },
     { name: "Leah", age: 29 }
+  ],
+  "Spanish Study Group": [
+    { name: "Isabel", age: 24 },
+    { name: "Mateo", age: 26 },
+    { name: "Lucia", age: 25 },
+    { name: "Camila", age: 23 },
+    { name: "Diego", age: 27 }
   ],
   "Running club": [
     { name: "Eli", age: 30 },
@@ -118,9 +126,137 @@ const fallbackNames = [
   "Anika",
   "Bennett"
 ];
-const groupPageColor = "#dcebff";
-const groupPageBackground =
-  "radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), #dcebff";
+const groupThemes = {
+  default: {
+    color: "#dcebff",
+    cardBg: "#dcebff",
+    cardBgAlt: "#dcebff",
+    cardBgThird: "#dcebff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  social: {
+    color: "#9fc4ff",
+    cardBg: "#dcebff",
+    cardBgAlt: "#dcebff",
+    cardBgThird: "#dcebff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  physical: {
+    color: "#f1ffc5",
+    cardBg: "#dcebff",
+    cardBgAlt: "#dcebff",
+    cardBgThird: "#dcebff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  educational: {
+    color: "#2f4f9a",
+    cardBg: "#dcebff",
+    cardBgAlt: "#dcebff",
+    cardBgThird: "#dcebff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  }
+};
+const socialThemeKeywords = [
+  "brunch",
+  "craft",
+  "crafting",
+  "coffee",
+  "scrapbook",
+  "pottery",
+  "movie",
+  "game night",
+  "book",
+  "art walk",
+  "live music",
+  "museum",
+  "cooking",
+  "friend",
+  "social"
+];
+const physicalThemeKeywords = [
+  "pickleball",
+  "running",
+  "run",
+  "hiking",
+  "hike",
+  "walking",
+  "trail",
+  "jog",
+  "tennis",
+  "badminton",
+  "pilates",
+  "yoga",
+  "cycling",
+  "bike",
+  "camping",
+  "court",
+  "fitness",
+  "sport"
+];
+const educationalThemeKeywords = [
+  "spanish",
+  "study",
+  "study group",
+  "language",
+  "class",
+  "tutoring",
+  "homework",
+  "learning",
+  "lecture",
+  "academic",
+  "educational"
+];
+
+function matchesThemeKeyword(value, keyword) {
+  if (keyword.includes(" ")) {
+    return value.includes(keyword);
+  }
+
+  return new RegExp(`\\b${keyword}\\b`).test(value);
+}
+
+function buildGroupThemeBackground(color) {
+  return `radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), ${color}`;
+}
+
+function getGroupTheme(title, description = "") {
+  const normalizedTitle = title.toLowerCase();
+  const normalized = `${title} ${description}`.toLowerCase();
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.social;
+  }
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.social;
+  }
+
+  return groupThemes.default;
+}
 const profileDetails = [
   {
     prompt: "Usually up for",
@@ -141,11 +277,20 @@ function applyPageTheme(title) {
     return;
   }
 
-  pageElement.style.setProperty("--group-page-bg", groupPageColor);
+  const theme = getGroupTheme(title, groupDescription);
+  const themeBackground = buildGroupThemeBackground(theme.color);
+
+  pageElement.style.setProperty("--group-page-bg", theme.color);
+  pageElement.style.setProperty("--member-card-bg", theme.cardBg);
+  pageElement.style.setProperty("--member-card-bg-alt", theme.cardBgAlt);
+  pageElement.style.setProperty("--member-card-bg-third", theme.cardBgThird);
+  pageElement.style.setProperty("--group-action-bg", theme.actionBg);
+  pageElement.style.setProperty("--group-action-bg-hover", theme.actionBgHover);
+  pageElement.style.setProperty("--group-action-border", theme.actionBorder);
 
   if (isSearchEmbedded) {
     window.parent.postMessage(
-      { type: "set-shell-nav-background", color: groupPageColor, background: groupPageBackground },
+      { type: "set-shell-nav-background", color: theme.color, background: themeBackground },
       "*"
     );
   }
@@ -199,6 +344,33 @@ function getInitials(name) {
     .map((part) => part.charAt(0))
     .join("")
     .toUpperCase();
+}
+
+function readDirectConversations() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(directConversationsStorageKey) || "[]");
+
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    localStorage.removeItem(directConversationsStorageKey);
+    return [];
+  }
+}
+
+function saveDirectConversation(memberName) {
+  const conversations = readDirectConversations();
+  const nextConversation = {
+    title: memberName,
+    preview: `You started a chat from ${groupTitle}.`,
+    time: "Now",
+    updatedAt: Date.now()
+  };
+  const nextConversations = [
+    nextConversation,
+    ...conversations.filter((conversation) => conversation?.title !== memberName)
+  ];
+
+  localStorage.setItem(directConversationsStorageKey, JSON.stringify(nextConversations));
 }
 
 function buildMemberProfile(member, index) {
@@ -329,6 +501,7 @@ function renderMembers() {
 
     closeAction.addEventListener("click", (event) => {
       event.stopPropagation();
+      saveDirectConversation(member.name);
 
       const returnParams = new URLSearchParams(window.location.search);
       const returnUrl = new URL(window.location.href);

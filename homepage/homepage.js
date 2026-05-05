@@ -27,8 +27,8 @@ let activePanel = "groups";
 const storageKey = "linkRequests";
 const defaultCenter = { lat: 35.9606, lng: -83.9207 };
 const panelNavBackgrounds = {
-  profile: "#f4f8ff",
-  messages: "#f4f8ff"
+  profile: "#dcebff",
+  messages: "#dcebff"
 };
 const appHeightProperty = "--app-height";
 const visualViewportOffsetProperty = "--visual-viewport-offset-top";
@@ -89,6 +89,15 @@ const detailParts = [
 ];
 const panelOrder = ["profile", "groups", "messages"];
 const skipSplashParam = "skipSplash";
+
+function redirectStandaloneHomepageToLogin() {
+  if (window.top !== window || shouldSkipSplash()) {
+    return false;
+  }
+
+  window.location.replace("../index.html");
+  return true;
+}
 
 function isTextEntryFocused() {
   const activeElement = document.activeElement;
@@ -340,13 +349,14 @@ function buildSuggestions(query) {
   const includes = seedSuggestions.filter(
     (item) => !item.startsWith(trimmed) && item.includes(trimmed)
   );
+  const alreadyGroupLike = /\b(club|group)\b/.test(trimmed);
   const related = [
-    `${trimmed} group`,
+    alreadyGroupLike ? trimmed : `${trimmed} group`,
     `${trimmed} near me`,
     `${trimmed} events`,
-    `${trimmed} club`,
+    alreadyGroupLike ? "" : `${trimmed} club`,
     `${trimmed} friends`
-  ];
+  ].filter(Boolean);
 
   const merged = [...startsWith, ...includes, ...related]
     .map((item) => sentenceCase(item))
@@ -396,12 +406,12 @@ function renderPendingGroups() {
 
   if (groups.length === 0) {
     pendingLinksShell.classList.add("is-hidden");
-    scrollTail.style.height = "214%";
+    scrollTail.style.height = "272%";
     return;
   }
 
   pendingLinksShell.classList.remove("is-hidden");
-  scrollTail.style.height = `${214 + groups.length * 24}%`;
+  scrollTail.style.height = `${272 + groups.length * 24}%`;
 
   groups.forEach((group) => {
     const item = document.createElement("article");
@@ -628,21 +638,24 @@ function setShellNavBackground(color = "") {
   resetShellNavBackground();
 }
 
-function setShellNavBackgroundImage(background = "") {
+function setShellNavBackgroundImage(background = "", isDark = false) {
   if (background) {
     page?.style.setProperty("--shell-nav-image", background);
     page?.classList.add("is-shell-group-page");
+    page?.classList.toggle("is-shell-dark-group", Boolean(isDark));
     return;
   }
 
   page?.style.removeProperty("--shell-nav-image");
   page?.classList.remove("is-shell-group-page");
+  page?.classList.remove("is-shell-dark-group");
 }
 
 function resetShellNavBackground() {
   page?.style.removeProperty("--shell-nav-bg");
   page?.style.removeProperty("--shell-nav-image");
   page?.classList.remove("is-shell-group-page");
+  page?.classList.remove("is-shell-dark-group");
 }
 
 function sendEmbeddedSearch(query) {
@@ -776,7 +789,7 @@ function setupHeaderSearch() {
 
     if (event.data?.type === "set-shell-nav-background") {
       setShellNavBackground(event.data.color);
-      setShellNavBackgroundImage(event.data.background || "");
+      setShellNavBackgroundImage(event.data.background || "", event.data.isDark);
       return;
     }
 
@@ -1125,14 +1138,16 @@ function setupGroupButtons() {
   });
 }
 
-setupStableViewport();
-renderCardTitles();
-renderCardPhotoDescriptions();
-setupCardPhotoSwipes();
-setupGroupButtons();
-resetPendingGroupsOnRefresh();
-renderPendingGroups();
-setupHeaderSearch();
-setupPanelSwipes();
-setupInitialPanelFromParams();
-startSplash();
+if (!redirectStandaloneHomepageToLogin()) {
+  setupStableViewport();
+  renderCardTitles();
+  renderCardPhotoDescriptions();
+  setupCardPhotoSwipes();
+  setupGroupButtons();
+  resetPendingGroupsOnRefresh();
+  renderPendingGroups();
+  setupHeaderSearch();
+  setupPanelSwipes();
+  setupInitialPanelFromParams();
+  startSplash();
+}

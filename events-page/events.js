@@ -18,9 +18,105 @@ const rawDescription =
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
 
 document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded);
-const groupPageColor = "#dcebff";
-const groupPageBackground =
-  "radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), #dcebff";
+const groupThemes = {
+  default: { color: "#dcebff" },
+  social: { color: "#9fc4ff" },
+  physical: { color: "#f1ffc5" },
+  educational: { color: "#2f4f9a" }
+};
+const socialThemeKeywords = [
+  "brunch",
+  "craft",
+  "crafting",
+  "coffee",
+  "scrapbook",
+  "pottery",
+  "movie",
+  "game night",
+  "book",
+  "art walk",
+  "live music",
+  "museum",
+  "cooking",
+  "friend",
+  "social"
+];
+const physicalThemeKeywords = [
+  "pickleball",
+  "running",
+  "run",
+  "hiking",
+  "hike",
+  "walking",
+  "trail",
+  "jog",
+  "tennis",
+  "badminton",
+  "pilates",
+  "yoga",
+  "cycling",
+  "bike",
+  "camping",
+  "court",
+  "fitness",
+  "sport"
+];
+const educationalThemeKeywords = [
+  "spanish",
+  "study",
+  "study group",
+  "language",
+  "class",
+  "tutoring",
+  "homework",
+  "learning",
+  "lecture",
+  "academic",
+  "educational"
+];
+
+function matchesThemeKeyword(value, keyword) {
+  if (keyword.includes(" ")) {
+    return value.includes(keyword);
+  }
+
+  return new RegExp(`\\b${keyword}\\b`).test(value);
+}
+
+function buildGroupThemeBackground(color) {
+  return `radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), ${color}`;
+}
+
+function getGroupTheme(title, description = "") {
+  const normalizedTitle = title.toLowerCase();
+  const normalized = `${title} ${description}`.toLowerCase();
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.social;
+  }
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.social;
+  }
+
+  return groupThemes.default;
+}
 
 const eventDirectory = {
   "Brunch Club": {
@@ -131,6 +227,43 @@ const eventDirectory = {
         spot: "World's Fair Park rec courts",
         bring: "Snack to share if you want",
         note: "A longer social session with snack break halfway through. We usually take a group photo near the end."
+      }
+    ]
+  },
+  "Spanish Study Group": {
+    month: "May 2026",
+    highlights: [
+      { day: 7, tone: "primary" },
+      { day: 14, tone: "secondary" },
+      { day: 21, tone: "primary" }
+    ],
+    events: [
+      {
+        day: "07",
+        month: "May",
+        title: "Conversation practice",
+        time: "5:30 PM",
+        spot: "Library study room B",
+        bring: "Notebook or vocab list",
+        note: "Low-pressure speaking practice with short prompts, pair rotations, and time to ask grammar questions."
+      },
+      {
+        day: "14",
+        month: "May",
+        title: "Vocab review night",
+        time: "6:00 PM",
+        spot: "Student center tables",
+        bring: "Five words to practice",
+        note: "Bring a few words you want to remember. We will make quick examples and practice using them in conversation."
+      },
+      {
+        day: "21",
+        month: "May",
+        title: "Cafe study session",
+        time: "4:30 PM",
+        spot: "Old City coffee loft",
+        bring: "Homework or flashcards",
+        note: "A quiet study block with a short group check-in at the beginning and end."
       }
     ]
   }
@@ -283,11 +416,14 @@ const eventData = getEventData();
 calendarMonth.textContent = eventData.month;
 backLink.href = `../group-page/index.html?${buildBackParams().toString()}`;
 if (pageElement) {
-  pageElement.style.setProperty("--group-page-bg", groupPageColor);
+  const theme = getGroupTheme(rawTitle, rawDescription);
+  const themeBackground = buildGroupThemeBackground(theme.color);
+
+  pageElement.style.setProperty("--group-page-bg", theme.color);
 
   if (isSearchEmbedded) {
     window.parent.postMessage(
-      { type: "set-shell-nav-background", color: groupPageColor, background: groupPageBackground },
+      { type: "set-shell-nav-background", color: theme.color, background: themeBackground },
       "*"
     );
   }

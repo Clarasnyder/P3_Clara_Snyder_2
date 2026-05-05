@@ -1,0 +1,423 @@
+@font-face {
+  font-family: "Alan Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/alan-sans:vf@latest/latin-wght-normal.woff2")
+    format("woff2-variations");
+}
+
+:root {
+  --page-bg: #dcebff;
+  --surface-bg: #eef4ff;
+  --accent: #6478ff;
+  --accent-soft: #dff478;
+  --accent-soft-strong: #c8f05a;
+  --text: #17243f;
+  --muted: #5f6f92;
+  --line: rgba(23, 36, 63, 0.16);
+  --shadow: 0 14px 28px rgba(23, 36, 63, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #dcebff;
+  font-family: "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+.phone-viewport {
+  width: min(calc((100dvh - 32px) * 0.460183), calc(100vw - 32px));
+  height: min(calc(100dvh - 32px), calc((100vw - 32px) / 0.460183));
+  display: grid;
+  place-items: center;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--page-bg);
+}
+
+.hero-banner {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 3;
+  height: 116px;
+  background: var(--page-bg);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 78px, rgba(0, 0, 0, 0.72) 94px, transparent 116px);
+  mask-image: linear-gradient(180deg, #000 0, #000 78px, rgba(0, 0, 0, 0.72) 94px, transparent 116px);
+}
+
+.top-nav {
+  position: absolute;
+  top: 28px;
+  left: 6.9652%;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  width: 86.0697%;
+  height: 36px;
+}
+
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  border-radius: 999px;
+  color: var(--text);
+  font: 600 0.86rem/1 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+  text-decoration: none;
+}
+
+.nav-item:first-child {
+  justify-content: flex-start;
+}
+
+.nav-item:last-child {
+  justify-content: flex-end;
+}
+
+.nav-item-current {
+  color: var(--accent);
+}
+
+.edit-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 112px 28px 28px;
+  overflow-y: auto;
+}
+
+.is-embedded .hero-banner {
+  display: none;
+}
+
+.is-embedded .edit-content {
+  padding-top: 28px;
+}
+
+.edit-content::-webkit-scrollbar {
+  width: 0;
+}
+
+.edit-header {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 14px;
+}
+
+.edit-header > div {
+  text-align: center;
+}
+
+.back-link {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(238, 244, 255, 0.78);
+  box-shadow: 0 10px 18px rgba(23, 36, 63, 0.1);
+}
+
+.back-chevron {
+  width: 12px;
+  height: 12px;
+  border-left: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
+  transform: rotate(45deg) translate(2px, -1px);
+}
+
+.edit-title {
+  margin: 0;
+  color: var(--text);
+  font: 600 1.8rem/1.05 "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
+}
+
+.edit-subtitle {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.profile-form {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 18px;
+}
+
+.avatar-field {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 6px 0 2px;
+}
+
+.avatar-preview {
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  overflow: hidden;
+  border: 1px solid rgba(23, 36, 63, 0.14);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  background-position: center;
+  background-size: cover;
+  color: #37500f;
+  font-family: "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  box-shadow: 0 12px 22px rgba(23, 36, 63, 0.12);
+}
+
+.avatar-preview.has-photo {
+  color: transparent;
+}
+
+.avatar-button,
+.save-button {
+  min-height: 46px;
+  border: 1.5px solid rgba(55, 80, 15, 0.28);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font: 700 0.95rem/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(23, 36, 63, 0.12);
+  transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.avatar-button {
+  padding: 0 18px;
+}
+
+.save-button {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.avatar-button:hover,
+.save-button:hover {
+  background: var(--accent-soft-strong);
+}
+
+.avatar-button:active,
+.save-button:active {
+  transform: scale(0.98);
+}
+
+.field-label {
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.field-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(238, 244, 255, 0.84);
+  color: var(--text);
+  font: 500 1rem/1.25 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  padding: 14px 16px;
+  outline: none;
+  box-shadow: 0 10px 20px rgba(23, 36, 63, 0.08);
+}
+
+.field-input:focus {
+  border-color: rgba(100, 120, 255, 0.48);
+  background: rgba(244, 248, 255, 0.94);
+}
+
+.field-textarea {
+  min-height: 112px;
+  resize: none;
+  line-height: 1.45;
+}
+
+.photo-camera-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: rgba(100, 120, 255, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.photo-camera-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.photo-camera-panel {
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  background: var(--surface-bg);
+  box-shadow: 0 18px 32px rgba(23, 36, 63, 0.16);
+}
+
+.photo-camera-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 14px;
+}
+
+.photo-camera-kicker {
+  margin: 0 0 4px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.photo-camera-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.08;
+}
+
+.photo-camera-close {
+  min-width: 4.35rem;
+  min-height: 2.35rem;
+  border: 1px solid rgba(23, 36, 63, 0.14);
+  border-radius: 999px;
+  background: #dcebff;
+  color: var(--text);
+  font: 500 0.88rem/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+  cursor: pointer;
+}
+
+.photo-camera-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 19rem;
+  overflow: hidden;
+  border: 1px solid rgba(23, 36, 63, 0.14);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.7), transparent 28%),
+    linear-gradient(150deg, #f4f8ff 0%, #dcebff 58%, #cfe0f7 100%);
+}
+
+.photo-camera-frame.has-error {
+  border-color: rgba(23, 36, 63, 0.22);
+}
+
+.photo-camera-video,
+.photo-camera-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-camera-canvas[hidden] {
+  display: none;
+}
+
+.photo-camera-error {
+  max-width: 14rem;
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.photo-camera-frame:not(.has-error) .photo-camera-error {
+  display: none;
+}
+
+.photo-camera-status {
+  position: absolute;
+  right: 0;
+  bottom: 1.45rem;
+  left: 0;
+  z-index: 3;
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(18, 27, 48, 0.45);
+}
+
+.photo-camera-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.95rem;
+}
+
+.photo-camera-shutter {
+  width: 4rem;
+  height: 4rem;
+  border: 4px solid #ffffff;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  box-shadow: 0 10px 20px rgba(23, 36, 63, 0.18);
+  cursor: pointer;
+  transition: transform 0.18s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.photo-camera-shutter:active {
+  transform: scale(0.94);
+}
+
+.photo-camera-shutter:disabled {
+  border-color: rgba(23, 36, 63, 0.08);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: none;
+  cursor: default;
+}
+
+@media (max-width: 430px) {
+  body {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .phone-viewport {
+    width: 100vw;
+    height: 100dvh;
+  }
+}

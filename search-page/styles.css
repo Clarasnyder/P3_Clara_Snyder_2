@@ -10,6 +10,10 @@
   --accent-soft: #dff478;
   --accent-soft-strong: #c8f05a;
   --accent-alt: #92bad5;
+  --group-sheet-bg: var(--page-bg);
+  --group-sheet-action-bg: var(--accent-soft);
+  --group-sheet-action-bg-hover: var(--accent-soft-strong);
+  --group-sheet-action-border: rgba(55, 80, 15, 0.28);
   --text: #17243f;
   --muted: #5f6f92;
   --line: rgba(23, 36, 63, 0.16);
@@ -32,7 +36,7 @@ body {
   place-items: center;
   padding: 16px;
   background: #dcebff;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .phone-viewport {
@@ -79,7 +83,7 @@ body {
 .map-frame .maplibregl-map {
   width: 100%;
   height: 100%;
-  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
 }
 
 .map-frame .maplibregl-canvas {
@@ -241,7 +245,7 @@ body {
   padding: 14px 22px max(34px, calc(env(safe-area-inset-bottom) + 28px));
   border-radius: 32px 32px 0 0;
   border-top: 1.5px solid var(--line);
-  background: var(--page-bg);
+  background: var(--group-sheet-bg);
   box-shadow: 0 -14px 28px rgba(23, 36, 63, 0.14);
   transform: translateY(104%);
   transition: transform 0.28s ease;
@@ -323,9 +327,9 @@ body {
 .group-sheet-action {
   min-width: 162px;
   padding: 15px 24px;
-  border: 1.5px solid rgba(55, 80, 15, 0.28);
+  border: 1.5px solid var(--group-sheet-action-border);
   border-radius: 999px;
-  background: var(--accent-soft);
+  background: var(--group-sheet-action-bg);
   box-shadow: 0 10px 20px rgba(23, 36, 63, 0.16);
   color: var(--text);
   font: 400 18px/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
@@ -334,7 +338,7 @@ body {
 }
 
 .group-sheet-action:hover {
-  background: var(--accent-soft-strong);
+  background: var(--group-sheet-action-bg-hover);
   box-shadow: 0 12px 22px rgba(23, 36, 63, 0.18);
 }
 

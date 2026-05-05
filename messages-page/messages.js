@@ -1,10 +1,98 @@
 const params = new URLSearchParams(window.location.search);
 const isEmbedded = params.get("embedded") === "1";
-const conversationLinks = document.querySelectorAll(".conversation-link");
+const conversationList = document.querySelector(".conversation-list");
 const profileNavLink = document.getElementById("profile-nav-link");
 const groupsNavLink = document.getElementById("groups-nav-link");
+const directConversationsStorageKey = "linkDirectConversations";
 
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
+
+function readDirectConversations() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(directConversationsStorageKey) || "[]");
+
+    return Array.isArray(stored) ? stored.filter((conversation) => conversation?.title) : [];
+  } catch {
+    localStorage.removeItem(directConversationsStorageKey);
+    return [];
+  }
+}
+
+function getInitials(name) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
+}
+
+function buildConversationUrl(title) {
+  const url = new URL("../group-text-page/index.html", window.location.href);
+
+  url.searchParams.set("title", title);
+
+  if (isEmbedded) {
+    url.searchParams.set("embedded", "1");
+  }
+
+  return url.toString();
+}
+
+function createDirectConversationCard(conversation) {
+  const link = document.createElement("a");
+  const avatar = document.createElement("div");
+  const copy = document.createElement("div");
+  const name = document.createElement("p");
+  const preview = document.createElement("p");
+  const time = document.createElement("span");
+  const title = conversation.title;
+
+  link.className = "conversation-card conversation-link conversation-direct";
+  link.href = buildConversationUrl(title);
+  link.setAttribute("aria-label", `Open ${title} messages`);
+  avatar.className = "conversation-avatar";
+  avatar.setAttribute("aria-hidden", "true");
+  copy.className = "conversation-copy";
+  name.className = "conversation-name";
+  preview.className = "conversation-preview";
+  time.className = "conversation-time";
+
+  avatar.textContent = getInitials(title);
+  name.textContent = title;
+  preview.textContent = conversation.preview || `You started a chat with ${title}.`;
+  time.textContent = conversation.time || "Now";
+
+  copy.append(name, preview);
+  link.append(avatar, copy, time);
+  return link;
+}
+
+function renderSavedDirectConversations() {
+  if (!conversationList) {
+    return;
+  }
+
+  readDirectConversations().reverse().forEach((conversation) => {
+    const existingCard = [...conversationList.querySelectorAll(".conversation-link")].find((card) => {
+      return card.querySelector(".conversation-name")?.textContent.trim() === conversation.title;
+    });
+
+    if (existingCard) {
+      const preview = existingCard.querySelector(".conversation-preview");
+      const time = existingCard.querySelector(".conversation-time");
+
+      existingCard.href = buildConversationUrl(conversation.title);
+      preview.textContent = conversation.preview || preview.textContent;
+      time.textContent = conversation.time || time.textContent;
+      conversationList.prepend(existingCard);
+      return;
+    }
+
+    conversationList.prepend(createDirectConversationCard(conversation));
+  });
+}
 
 function postPanelNavigation(panel) {
   window.parent.postMessage({ type: "navigate-panel", panel }, "*");
@@ -121,7 +209,7 @@ function setupEmbeddedPanelSwipes() {
 
 function setupEmbeddedMode() {
   if (isEmbedded) {
-    conversationLinks.forEach((link) => {
+    document.querySelectorAll(".conversation-link").forEach((link) => {
       const url = new URL(link.getAttribute("href"), window.location.href);
 
       url.searchParams.set("embedded", "1");
@@ -141,5 +229,6 @@ function setupEmbeddedMode() {
   }
 }
 
+renderSavedDirectConversations();
 setupEmbeddedMode();
 setupEmbeddedPanelSwipes();

@@ -19,7 +19,9 @@ const cameraError = document.getElementById("camera-error");
 const cameraStatus = document.getElementById("camera-status");
 const cameraActions = document.getElementById("camera-actions");
 const cameraShutterButton = document.getElementById("camera-shutter-button");
-const cameraSubmitButton = document.getElementById("camera-submit-button");
+const proofConfirmation = document.getElementById("proof-confirmation");
+const proofRetakeButton = document.getElementById("proof-retake-button");
+const proofSubmitButton = document.getElementById("proof-submit-button");
 const backLink = document.getElementById("back-link");
 const pageElement = document.getElementById("group-page");
 
@@ -44,9 +46,128 @@ const backTargets = {
   home: "../homepage/index.html?skipSplash=1",
   groups: "../my-groups-page/index.html"
 };
-const groupPageColor = "#dcebff";
-const groupPageBackground =
-  "radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), #dcebff";
+const groupThemes = {
+  default: {
+    color: "#dcebff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  social: {
+    color: "#9fc4ff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  physical: {
+    color: "#f1ffc5",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  educational: {
+    color: "#2f4f9a",
+    background:
+      "linear-gradient(180deg, #3d63b8 0%, #2f4f9a 36%, #28478f 100%)",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)",
+    isDark: true
+  }
+};
+const socialThemeKeywords = [
+  "brunch",
+  "craft",
+  "crafting",
+  "coffee",
+  "scrapbook",
+  "pottery",
+  "movie",
+  "game night",
+  "book",
+  "art walk",
+  "live music",
+  "museum",
+  "cooking",
+  "friend",
+  "social"
+];
+const physicalThemeKeywords = [
+  "pickleball",
+  "running",
+  "run",
+  "hiking",
+  "hike",
+  "walking",
+  "trail",
+  "jog",
+  "tennis",
+  "badminton",
+  "pilates",
+  "yoga",
+  "cycling",
+  "bike",
+  "camping",
+  "court",
+  "fitness",
+  "sport"
+];
+const educationalThemeKeywords = [
+  "spanish",
+  "study",
+  "study group",
+  "language",
+  "class",
+  "tutoring",
+  "homework",
+  "learning",
+  "lecture",
+  "academic",
+  "educational"
+];
+
+function matchesThemeKeyword(value, keyword) {
+  if (keyword.includes(" ")) {
+    return value.includes(keyword);
+  }
+
+  return new RegExp(`\\b${keyword}\\b`).test(value);
+}
+
+function buildGroupThemeBackground(color) {
+  return `radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0) 26%), radial-gradient(circle at 82% 12%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 22%), linear-gradient(135deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 38%, rgba(255, 255, 255, 0.16) 100%), ${color}`;
+}
+
+function getGroupTheme(title, description = "") {
+  const normalizedTitle = title.toLowerCase();
+  const normalized = `${title} ${description}`.toLowerCase();
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.social;
+  }
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.social;
+  }
+
+  return groupThemes.default;
+}
 const sharedCheckinTasks = [
   {
     title: "Meet 2 new people",
@@ -114,6 +235,23 @@ const groupCheckinTasks = {
       title: "Learn a lucky shot",
       getTask: () =>
         "Find someone who has a favorite shot or move. Ask them to name it, then tell them yours or one you want to learn."
+    }
+  ],
+  "spanish study group": [
+    {
+      title: "Find a phrase partner",
+      getTask: () =>
+        "Find someone practicing at a similar level and trade one phrase you want to use more naturally."
+    },
+    {
+      title: "Practice a tiny intro",
+      getTask: () =>
+        "Introduce yourself to someone new in Spanish, then ask what topic they want to get better at discussing."
+    },
+    {
+      title: "Swap study tricks",
+      getTask: () =>
+        "Ask someone what helps them remember new words. Share one method that has worked for you."
     }
   ],
   "running club": [
@@ -231,6 +369,10 @@ const keywordCheckinTasks = [
     keywords: ["pickleball", "tennis", "court"],
     key: "pickleball"
   },
+  {
+    keywords: ["spanish", "study", "language", "class"],
+    key: "spanish study group"
+  },
 ];
 let activeCheckinTaskIndex = 0;
 let cameraStream = null;
@@ -244,11 +386,23 @@ function applyPageTheme(title) {
     return;
   }
 
-  pageElement.style.setProperty("--group-page-bg", groupPageColor);
+  const theme = getGroupTheme(title, rawDescription);
+  const themeBackground = theme.background || buildGroupThemeBackground(theme.color);
+
+  pageElement.classList.toggle("is-dark-theme", Boolean(theme.isDark));
+  pageElement.style.setProperty("--group-page-bg", theme.color);
+  pageElement.style.setProperty("--group-page-background", themeBackground);
+  pageElement.style.setProperty("--text", theme.isDark ? "#eef4ff" : "#17243f");
+  pageElement.style.setProperty("--muted", theme.isDark ? "#c9d4ea" : "#5f6f92");
+  pageElement.style.setProperty("--accent", theme.isDark ? "#dbe6ff" : "#6478ff");
+  pageElement.style.setProperty("--group-action-bg", theme.actionBg);
+  pageElement.style.setProperty("--group-action-bg-hover", theme.actionBgHover);
+  pageElement.style.setProperty("--group-action-bg-active", theme.actionBgHover);
+  pageElement.style.setProperty("--group-action-border", theme.actionBorder);
 
   if (isSearchEmbedded) {
     window.parent.postMessage(
-      { type: "set-shell-nav-background", color: groupPageColor, background: groupPageBackground },
+      { type: "set-shell-nav-background", color: theme.color, background: themeBackground, isDark: Boolean(theme.isDark) },
       "*"
     );
   }
@@ -295,26 +449,34 @@ function stopCameraStream() {
 
 function resetCameraProof() {
   cameraFrame.classList.remove("has-photo", "has-error", "is-loading");
-  cameraActions.classList.remove("has-proof");
+  closeProofConfirmation();
   cameraCanvas.hidden = true;
   cameraVideo.hidden = false;
   cameraError.textContent = "";
   cameraStatus.textContent = "Opening camera";
   cameraShutterButton.setAttribute("aria-label", "Take photo");
   cameraShutterButton.disabled = true;
-  cameraSubmitButton.disabled = true;
 }
 
 function showCameraError(message) {
   cameraFrame.classList.remove("is-loading");
   cameraFrame.classList.add("has-error");
-  cameraActions.classList.remove("has-proof");
+  closeProofConfirmation();
   cameraVideo.hidden = true;
   cameraCanvas.hidden = true;
   cameraError.textContent = message;
   cameraStatus.textContent = "Camera unavailable";
   cameraShutterButton.disabled = true;
-  cameraSubmitButton.disabled = true;
+}
+
+function openProofConfirmation() {
+  proofConfirmation?.classList.add("is-open");
+  proofConfirmation?.setAttribute("aria-hidden", "false");
+}
+
+function closeProofConfirmation() {
+  proofConfirmation?.classList.remove("is-open");
+  proofConfirmation?.setAttribute("aria-hidden", "true");
 }
 
 async function startCameraProof() {
@@ -331,7 +493,7 @@ async function startCameraProof() {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
-        facingMode: { ideal: "environment" }
+        facingMode: { ideal: "user" }
       }
     });
 
@@ -366,22 +528,20 @@ function captureCameraProof() {
   context.drawImage(cameraVideo, 0, 0, width, height);
 
   cameraFrame.classList.add("has-photo");
-  cameraActions.classList.add("has-proof");
   cameraCanvas.hidden = false;
   cameraVideo.hidden = true;
   cameraStatus.textContent = "Proof captured";
   cameraShutterButton.setAttribute("aria-label", "Retake photo");
-  cameraSubmitButton.disabled = false;
+  openProofConfirmation();
 }
 
 function retakeCameraProof() {
   cameraFrame.classList.remove("has-photo");
-  cameraActions.classList.remove("has-proof");
+  closeProofConfirmation();
   cameraCanvas.hidden = true;
   cameraVideo.hidden = false;
   cameraStatus.textContent = "Line up your proof";
   cameraShutterButton.setAttribute("aria-label", "Take photo");
-  cameraSubmitButton.disabled = true;
 }
 
 function showCheckinTaskView() {
@@ -415,6 +575,7 @@ function closeCheckinOverlay() {
 }
 
 function submitCheckinProof() {
+  closeProofConfirmation();
   stopCameraStream();
   checkinButton.textContent = "Check-in complete";
   checkinButton.classList.add("is-complete");
@@ -552,4 +713,6 @@ cameraShutterButton.addEventListener("click", () => {
   captureCameraProof();
 });
 
-cameraSubmitButton.addEventListener("click", submitCheckinProof);
+proofRetakeButton.addEventListener("click", retakeCameraProof);
+
+proofSubmitButton.addEventListener("click", submitCheckinProof);

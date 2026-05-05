@@ -11,6 +11,7 @@ const backLink = document.querySelector(".back-link");
 const profileNavLink = document.getElementById("profile-nav-link");
 const groupsNavLink = document.getElementById("groups-nav-link");
 const messagesNavLink = document.getElementById("messages-nav-link");
+const directConversationsStorageKey = "linkDirectConversations";
 
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
 document.documentElement.classList.toggle("is-framed", isFramed);
@@ -87,6 +88,160 @@ const conversation = conversationSeed[activeTitle] || {
     { author: "You", text: "Yes, that sounds way less intimidating.", self: true }
   ]
 };
+
+function readDirectConversations() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(directConversationsStorageKey) || "[]");
+
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    localStorage.removeItem(directConversationsStorageKey);
+    return [];
+  }
+}
+
+function saveDirectConversation(preview = `You started a chat with ${activeTitle}.`) {
+  if (conversation.subtitle !== "Direct message") {
+    return;
+  }
+
+  const conversations = readDirectConversations();
+  const nextConversation = {
+    title: activeTitle,
+    preview,
+    time: "Now",
+    updatedAt: Date.now()
+  };
+  const nextConversations = [
+    nextConversation,
+    ...conversations.filter((storedConversation) => storedConversation?.title !== activeTitle)
+  ];
+
+  localStorage.setItem(directConversationsStorageKey, JSON.stringify(nextConversations));
+}
+const groupThemes = {
+  default: {
+    messageBg: "#dcebff",
+    messageText: "#17243f",
+    messageBorder: "rgba(23, 36, 63, 0.16)",
+    messageShadow: "0 10px 18px rgba(23, 36, 63, 0.12)"
+  },
+  social: {
+    messageBg: "#9fc4ff",
+    messageText: "#17243f",
+    messageBorder: "rgba(23, 36, 63, 0.16)",
+    messageShadow: "0 10px 18px rgba(47, 79, 154, 0.18)"
+  },
+  physical: {
+    messageBg: "#f1ffc5",
+    messageText: "#17243f",
+    messageBorder: "rgba(55, 80, 15, 0.18)",
+    messageShadow: "0 10px 18px rgba(55, 80, 15, 0.14)"
+  },
+  educational: {
+    messageBg: "#2f4f9a",
+    messageText: "#ffffff",
+    messageBorder: "rgba(23, 36, 63, 0.18)",
+    messageShadow: "0 10px 18px rgba(47, 79, 154, 0.24)"
+  }
+};
+const socialThemeKeywords = [
+  "brunch",
+  "craft",
+  "crafting",
+  "coffee",
+  "scrapbook",
+  "pottery",
+  "movie",
+  "game night",
+  "book",
+  "art walk",
+  "live music",
+  "museum",
+  "cooking",
+  "friend",
+  "social"
+];
+const physicalThemeKeywords = [
+  "pickleball",
+  "running",
+  "run",
+  "hiking",
+  "hike",
+  "walking",
+  "trail",
+  "jog",
+  "tennis",
+  "badminton",
+  "pilates",
+  "yoga",
+  "cycling",
+  "bike",
+  "camping",
+  "court",
+  "fitness",
+  "sport"
+];
+const educationalThemeKeywords = [
+  "spanish",
+  "study",
+  "study group",
+  "language",
+  "class",
+  "tutoring",
+  "homework",
+  "learning",
+  "lecture",
+  "academic",
+  "educational"
+];
+
+function matchesThemeKeyword(value, keyword) {
+  if (keyword.includes(" ")) {
+    return value.includes(keyword);
+  }
+
+  return new RegExp(`\\b${keyword}\\b`).test(value);
+}
+
+function getGroupTheme(title) {
+  const normalizedTitle = title.toLowerCase();
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedTitle, keyword))) {
+    return groupThemes.social;
+  }
+
+  return groupThemes.default;
+}
+
+function applyConversationTheme() {
+  const isGroupThread = conversation.subtitle !== "Direct message";
+
+  document.body.classList.toggle("is-group-thread", isGroupThread);
+
+  if (!isGroupThread) {
+    document.body.style.removeProperty("--self-message-bg");
+    document.body.style.removeProperty("--self-message-text");
+    document.body.style.removeProperty("--self-message-border");
+    document.body.style.removeProperty("--self-message-shadow");
+    return;
+  }
+
+  const theme = getGroupTheme(activeTitle);
+
+  document.body.style.setProperty("--self-message-bg", theme.messageBg);
+  document.body.style.setProperty("--self-message-text", theme.messageText);
+  document.body.style.setProperty("--self-message-border", theme.messageBorder);
+  document.body.style.setProperty("--self-message-shadow", theme.messageShadow);
+}
 
 function postPanelNavigation(panel) {
   window.parent.postMessage({ type: "navigate-panel", panel }, "*");
@@ -291,7 +446,7 @@ function renderMessages() {
   chatSubtitle.textContent = conversation.subtitle;
   chatInput.placeholder = `Message ${activeTitle}`;
   document.title = `${activeTitle} Chat`;
-  document.body.classList.toggle("is-group-thread", conversation.subtitle !== "Direct message");
+  applyConversationTheme();
   chatThread.innerHTML = "";
 
   conversation.messages.forEach((message) => {
@@ -327,6 +482,7 @@ chatCompose.addEventListener("submit", (event) => {
   }
 
   appendMessage(value);
+  saveDirectConversation(value);
   chatInput.value = "";
   chatInput.focus();
 });

@@ -2,6 +2,20 @@ const params = new URLSearchParams(window.location.search);
 const isEmbedded = params.get("embedded") === "1";
 const groupsNavLink = document.getElementById("groups-nav-link");
 const messagesNavLink = document.getElementById("messages-nav-link");
+const editProfileButton = document.getElementById("edit-profile-button");
+const accountAvatar = document.getElementById("account-avatar");
+const accountName = document.getElementById("account-name");
+const accountHandle = document.getElementById("account-handle");
+const accountLocation = document.getElementById("account-location");
+const accountBio = document.getElementById("account-bio");
+const profileStorageKey = "linkProfile";
+const defaultProfile = {
+  name: "Clara Snyder",
+  handle: "@clarasnyder",
+  location: "Knoxville, Tennessee",
+  bio: "Into brunch plans, creative projects, and meeting new people around town.",
+  photo: ""
+};
 
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
 
@@ -133,5 +147,58 @@ function setupEmbeddedMode() {
   }
 }
 
+function setupEditProfileButton() {
+  editProfileButton?.addEventListener("click", () => {
+    const nextParams = new URLSearchParams();
+
+    if (isEmbedded) {
+      nextParams.set("embedded", "1");
+    }
+
+    const queryString = nextParams.toString();
+    window.location.href = `../edit-profile-page/index.html${queryString ? `?${queryString}` : ""}`;
+  });
+}
+
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) {
+    return "CS";
+  }
+
+  return parts.slice(0, 2).map((part) => part.charAt(0).toUpperCase()).join("");
+}
+
+function readProfile() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(profileStorageKey) || "{}");
+    return { ...defaultProfile, ...stored };
+  } catch (error) {
+    return { ...defaultProfile };
+  }
+}
+
+function renderProfile() {
+  const profile = readProfile();
+
+  accountName.textContent = profile.name;
+  accountHandle.textContent = profile.handle;
+  accountLocation.textContent = profile.location;
+  accountBio.textContent = profile.bio;
+  accountAvatar.textContent = getInitials(profile.name);
+
+  if (profile.photo) {
+    accountAvatar.style.backgroundImage = `url("${profile.photo}")`;
+    accountAvatar.classList.add("has-photo");
+    return;
+  }
+
+  accountAvatar.style.removeProperty("background-image");
+  accountAvatar.classList.remove("has-photo");
+}
+
+renderProfile();
 setupEmbeddedMode();
 setupEmbeddedPanelSwipes();
+setupEditProfileButton();

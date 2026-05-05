@@ -18,7 +18,7 @@
       }
 
       :root {
-        --app-shell-bg: #dcebff;
+        --app-shell-bg: #cfe3fb;
         --splash-bg: #17243f;
         --splash-text: #f4f8ff;
       }
@@ -37,7 +37,7 @@
       }
 
       body {
-        font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+        font-family: "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
       }
 
       .home-frame {
@@ -63,9 +63,7 @@
         opacity: 1;
         transform: translate(-50%, -50%);
         visibility: visible;
-        transition:
-          opacity 0.72s ease,
-          visibility 0s linear 0.72s;
+        transition: opacity 0.28s ease;
       }
 
       .splash-mark {
@@ -73,7 +71,7 @@
         justify-items: center;
         gap: 18px;
         transform: translateY(0);
-        transition: transform 0.72s ease;
+        transition: transform 0.64s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .splash-icon-shell {
@@ -119,22 +117,187 @@
       }
 
       .splash-screen.is-fading {
-        opacity: 0;
-        visibility: hidden;
+        background: transparent;
         pointer-events: none;
       }
 
       .splash-screen.is-fading .splash-mark {
-        transform: translateY(-8px);
+        transform: translateY(-140px) scale(0.9);
+      }
+
+      .splash-screen.is-settled .splash-icon-fill {
+        animation: none;
+        opacity: 1;
+      }
+
+      .splash-screen.is-settled .splash-icon-stroke {
+        animation: none;
+        opacity: 0;
+      }
+
+      .splash-screen.is-complete {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
       }
 
       .splash-screen.is-hidden {
         display: none;
       }
 
+      .login-screen {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 19;
+        display: grid;
+        place-items: center;
+        width: min(calc((100dvh - 32px) * 0.460183), calc(100vw - 32px));
+        height: min(calc(100dvh - 32px), calc((100vw - 32px) / 0.460183));
+        padding: 42px 34px;
+        background: var(--splash-bg);
+        color: var(--splash-text);
+        overflow: hidden;
+        opacity: 1;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        visibility: visible;
+        transition:
+          opacity 0.36s ease,
+          visibility 0s linear 0.36s;
+      }
+
+      .login-screen.is-open {
+        pointer-events: auto;
+      }
+
+      .login-screen.is-complete {
+        opacity: 0;
+        pointer-events: none;
+        visibility: hidden;
+      }
+
+      .login-screen.is-hidden {
+        display: none;
+      }
+
+      .login-panel {
+        display: grid;
+        justify-items: center;
+        width: 100%;
+        gap: 28px;
+        margin-top: 238px;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .login-brand {
+        display: none;
+        justify-items: center;
+        gap: 14px;
+        opacity: 0;
+      }
+
+      .login-icon {
+        display: block;
+        width: 74px;
+        height: 74px;
+        filter: brightness(0) invert(1);
+      }
+
+      .login-title {
+        margin: 0;
+        color: var(--splash-text);
+        font-family: "Alan Sans", Inter, "Helvetica Neue", Arial, sans-serif;
+        font-size: 56px;
+        font-weight: 400;
+        line-height: 1;
+        text-align: center;
+      }
+
+      .login-form {
+        display: grid;
+        width: 100%;
+        gap: 14px;
+        opacity: 0;
+        transform: translateY(38px);
+        transition:
+          opacity 0.36s ease 0.18s,
+          transform 0.56s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+      }
+
+      .login-screen.is-open .login-form {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .login-field {
+        display: grid;
+        gap: 8px;
+        color: var(--splash-text);
+        font: 500 0.9rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .login-input {
+        width: 100%;
+        height: 52px;
+        border: 1px solid rgba(244, 248, 255, 0.24);
+        border-radius: 999px;
+        background: rgba(244, 248, 255, 0.12);
+        color: var(--splash-text);
+        font: 500 1rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+        outline: none;
+        padding: 0 18px;
+      }
+
+      .login-input::placeholder {
+        color: rgba(244, 248, 255, 0.58);
+      }
+
+      .login-input:focus {
+        border-color: rgba(244, 248, 255, 0.62);
+        background: rgba(244, 248, 255, 0.16);
+      }
+
+      .login-submit {
+        width: 100%;
+        min-height: 52px;
+        margin-top: 8px;
+        border: 1.5px solid rgba(55, 80, 15, 0.28);
+        border-radius: 999px;
+        background: #dff478;
+        box-shadow: 0 12px 22px rgba(4, 9, 24, 0.22);
+        color: #17243f;
+        font: 700 1rem/1 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+        cursor: pointer;
+        transition: background-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+      }
+
+      .login-submit:hover {
+        background: #c8f05a;
+      }
+
+      .login-submit:active {
+        transform: scale(0.98);
+      }
+
+      .login-error {
+        min-height: 1.2em;
+        margin: 0;
+        color: #f4f8ff;
+        font: 500 0.86rem/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+        opacity: 0;
+        text-align: center;
+      }
+
+      .login-error.is-visible {
+        opacity: 1;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .splash-screen,
         .splash-mark,
+        .login-panel,
         .splash-icon-fill,
         .splash-icon-stroke {
           animation: none;
@@ -151,7 +314,8 @@
       }
 
       @media (max-width: 430px) {
-        .splash-screen {
+        .splash-screen,
+        .login-screen {
           width: 100vw;
           height: 100dvh;
         }
@@ -223,21 +387,101 @@
       </div>
     </section>
 
+    <section class="login-screen" id="login-screen" aria-label="Log in">
+      <div class="login-panel">
+        <div class="login-brand" aria-hidden="true">
+          <img class="login-icon" src="./assets/icons/link.svg" alt="" />
+          <h1 class="login-title">link</h1>
+        </div>
+
+        <form class="login-form" id="login-form">
+          <label class="login-field">
+            Username
+            <input
+              class="login-input"
+              id="login-username"
+              type="text"
+              autocomplete="username"
+              placeholder="username"
+            />
+          </label>
+
+          <label class="login-field">
+            Password
+            <input
+              class="login-input"
+              id="login-password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="password"
+            />
+          </label>
+
+          <button class="login-submit" type="submit">lets link!</button>
+          <p class="login-error" id="login-error">Check your username and password.</p>
+        </form>
+      </div>
+    </section>
+
     <script>
       const splashScreen = document.getElementById("splash-screen");
+      const loginScreen = document.getElementById("login-screen");
+      const loginForm = document.getElementById("login-form");
+      const loginUsername = document.getElementById("login-username");
+      const loginPassword = document.getElementById("login-password");
+      const loginError = document.getElementById("login-error");
+
+      function resetLoginIntroState() {
+        splashScreen?.classList.remove("is-fading", "is-settled", "is-complete", "is-hidden");
+        loginScreen?.classList.remove("is-open", "is-complete", "is-hidden");
+        loginError?.classList.remove("is-visible");
+      }
 
       function hideSplash() {
         if (!splashScreen) {
           return;
         }
 
+        loginScreen?.classList.remove("is-hidden", "is-complete");
         splashScreen.classList.add("is-fading");
+        loginScreen?.classList.add("is-open");
         window.setTimeout(() => {
-          splashScreen.classList.add("is-hidden");
-        }, 760);
+          splashScreen.classList.add("is-settled");
+          loginUsername?.focus();
+        }, 740);
       }
 
+      loginForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const username = loginUsername.value.trim().toLowerCase();
+        const password = loginPassword.value;
+
+        if (username === "clarasnyder" && password === "password") {
+          loginError.classList.remove("is-visible");
+          localStorage.removeItem("linkProfile");
+          splashScreen.classList.add("is-complete");
+          loginScreen.classList.add("is-complete");
+          loginScreen.classList.remove("is-open");
+          window.setTimeout(() => {
+            splashScreen.classList.add("is-hidden");
+            loginScreen.classList.add("is-hidden");
+          }, 380);
+          return;
+        }
+
+        loginError.classList.add("is-visible");
+      });
+
+      resetLoginIntroState();
       window.setTimeout(hideSplash, 3200);
+
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          resetLoginIntroState();
+          window.setTimeout(hideSplash, 3200);
+        }
+      });
     </script>
   </body>
 </html>

@@ -302,6 +302,130 @@ const detailParts = [
   "recurring neighborhood sessions and spontaneous plans.",
   "meeting up with people who share the same interest."
 ];
+const groupThemes = {
+  default: {
+    sheetBg: "#f4f8ff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  social: {
+    sheetBg: "#9fc4ff",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  },
+  physical: {
+    sheetBg: "#f1ffc5",
+    actionBg: "#e7fb8f",
+    actionBgHover: "#dff478",
+    actionBorder: "rgba(55, 80, 15, 0.24)"
+  },
+  educational: {
+    sheetBg: "#2f4f9a",
+    actionBg: "#dff478",
+    actionBgHover: "#c8f05a",
+    actionBorder: "rgba(55, 80, 15, 0.28)"
+  }
+};
+const socialThemeKeywords = [
+  "brunch",
+  "craft",
+  "crafting",
+  "coffee",
+  "scrapbook",
+  "pottery",
+  "movie",
+  "game night",
+  "book",
+  "art walk",
+  "live music",
+  "museum",
+  "cooking",
+  "friend",
+  "social"
+];
+const physicalThemeKeywords = [
+  "pickleball",
+  "running",
+  "run",
+  "hiking",
+  "hike",
+  "walking",
+  "trail",
+  "jog",
+  "tennis",
+  "badminton",
+  "pilates",
+  "yoga",
+  "cycling",
+  "bike",
+  "camping",
+  "court",
+  "fitness",
+  "sport"
+];
+const educationalThemeKeywords = [
+  "spanish",
+  "study",
+  "study group",
+  "language",
+  "class",
+  "tutoring",
+  "homework",
+  "learning",
+  "lecture",
+  "academic",
+  "educational"
+];
+
+function matchesThemeKeyword(value, keyword) {
+  if (keyword.includes(" ")) {
+    return value.includes(keyword);
+  }
+
+  return new RegExp(`\\b${keyword}\\b`).test(value);
+}
+
+function getGroupTheme(label, description = "") {
+  const normalizedLabel = label.toLowerCase();
+  const normalized = `${label} ${description}`.toLowerCase();
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedLabel, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedLabel, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalizedLabel, keyword))) {
+    return groupThemes.social;
+  }
+
+  if (educationalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.educational;
+  }
+
+  if (physicalThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.physical;
+  }
+
+  if (socialThemeKeywords.some((keyword) => matchesThemeKeyword(normalized, keyword))) {
+    return groupThemes.social;
+  }
+
+  return groupThemes.default;
+}
+
+function applyGroupSheetTheme(group) {
+  const theme = getGroupTheme(group.label, group.description);
+
+  groupSheet.style.setProperty("--group-sheet-bg", theme.sheetBg);
+  groupSheet.style.setProperty("--group-sheet-action-bg", theme.actionBg);
+  groupSheet.style.setProperty("--group-sheet-action-bg-hover", theme.actionBgHover);
+  groupSheet.style.setProperty("--group-sheet-action-border", theme.actionBorder);
+}
 
 function toSearchLabel(value) {
   return value.replace(/^Search for "|"$|^Search for /g, "");
@@ -423,6 +547,7 @@ function showRequestOverlay(onFadeStart, onComplete) {
 }
 
 function openGroupSheet(group) {
+  applyGroupSheetTheme(group);
   groupSheetTitle.textContent = sentenceCase(group.label);
   groupSheetMembers.textContent = `${group.members} members`;
   groupSheetDescription.textContent = group.description;
@@ -559,13 +684,14 @@ function buildSuggestions(query) {
   const includes = seedSuggestions.filter(
     (item) => !item.startsWith(trimmed) && item.includes(trimmed)
   );
+  const alreadyGroupLike = /\b(club|group)\b/.test(trimmed);
   const related = [
-    `${trimmed} group`,
+    alreadyGroupLike ? trimmed : `${trimmed} group`,
     `${trimmed} near me`,
     `${trimmed} events`,
-    `${trimmed} club`,
+    alreadyGroupLike ? "" : `${trimmed} club`,
     `${trimmed} friends`
-  ];
+  ].filter(Boolean);
 
   const merged = [...startsWith, ...includes, ...related]
     .map((item) => sentenceCase(item))
