@@ -7,6 +7,22 @@ const directConversationsStorageKey = "linkDirectConversations";
 
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
 
+function isReloadNavigation() {
+  const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+
+  if (navigationEntry) {
+    return navigationEntry.type === "reload";
+  }
+
+  return performance.navigation?.type === 1;
+}
+
+function resetDirectConversationsOnRefresh() {
+  if (isReloadNavigation()) {
+    localStorage.removeItem(directConversationsStorageKey);
+  }
+}
+
 function readDirectConversations() {
   try {
     const stored = JSON.parse(localStorage.getItem(directConversationsStorageKey) || "[]");
@@ -229,6 +245,7 @@ function setupEmbeddedMode() {
   }
 }
 
+resetDirectConversationsOnRefresh();
 renderSavedDirectConversations();
 setupEmbeddedMode();
 setupEmbeddedPanelSwipes();

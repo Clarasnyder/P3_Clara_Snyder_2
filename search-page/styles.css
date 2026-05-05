@@ -600,11 +600,18 @@ body {
   background: rgba(100, 120, 255, 0.22);
 }
 
+html.is-embedded .hero-banner,
+html.is-embedded .bottom-nav,
 body.is-embedded .hero-banner,
 body.is-embedded .bottom-nav {
   display: none;
 }
 
+html.is-embedded .page,
+html.is-embedded .map-layer,
+html.is-embedded .map-frame,
+html.is-embedded .map-frame .maplibregl-map,
+html.is-embedded .map-frame .maplibregl-canvas,
 body.is-embedded .page,
 body.is-embedded .map-layer,
 body.is-embedded .map-frame,
@@ -613,16 +620,21 @@ body.is-embedded .map-frame .maplibregl-canvas {
   border-radius: 32px 32px 0 0;
 }
 
+html.is-embedded .page,
+html.is-embedded .map-layer,
+html.is-embedded .map-frame,
 body.is-embedded .page,
 body.is-embedded .map-layer,
 body.is-embedded .map-frame {
   overflow: hidden;
 }
 
+html.is-embedded .map-layer,
 body.is-embedded .map-layer {
   inset: 0;
 }
 
+html.is-embedded .map-frame .maplibregl-ctrl-bottom-right,
 body.is-embedded .map-frame .maplibregl-ctrl-bottom-right {
   inset: auto 8px 16px auto;
 }

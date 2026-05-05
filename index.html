@@ -486,6 +486,7 @@
       const pageParams = new URLSearchParams(window.location.search);
       const shouldShowLoginOnly = pageParams.get("login") === "1";
       const pendingLinksStorageKey = "linkRequests";
+      const directConversationsStorageKey = "linkDirectConversations";
       let stableAppHeight = window.innerHeight;
 
       function isTextEntryFocused() {
@@ -503,6 +504,24 @@
         }
 
         document.documentElement.style.setProperty("--app-height", `${stableAppHeight}px`);
+      }
+
+      function isReloadNavigation() {
+        const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+
+        if (navigationEntry) {
+          return navigationEntry.type === "reload";
+        }
+
+        return performance.navigation?.type === 1;
+      }
+
+      function resetRefreshOnlyState() {
+        if (!isReloadNavigation()) {
+          return;
+        }
+
+        localStorage.removeItem(directConversationsStorageKey);
       }
 
       function resetLoginIntroState() {
@@ -580,6 +599,7 @@
       }
 
       setStableAppHeight(true);
+      resetRefreshOnlyState();
       window.addEventListener("resize", () => setStableAppHeight());
       window.visualViewport?.addEventListener("resize", () => setStableAppHeight());
       resetLoginIntroState();

@@ -622,6 +622,8 @@ function buildBackHref() {
   }
 
   const backParams = new URLSearchParams();
+  backParams.set("skipSplash", "1");
+  backParams.set("searchOpen", "1");
 
   if (rawSearch) {
     backParams.set("search", rawSearch);
@@ -643,8 +645,7 @@ function buildBackHref() {
     backParams.set("embedded", "1");
   }
 
-  const queryString = backParams.toString();
-  return queryString ? `${backTargets.search}?${queryString}` : backTargets.search;
+  return `../homepage/index.html?${backParams.toString()}`;
 }
 
 titleElement.textContent = rawTitle;

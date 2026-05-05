@@ -343,20 +343,22 @@ body {
   transform: translateY(0);
 }
 
-.search-overlay.is-fullscreen .search-overlay-panel {
+.search-overlay-collapse-zone {
+  position: absolute;
   top: 0;
-  border-radius: 0;
-  box-shadow: none;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .page.is-search-open .bottom-search-dock {
   top: 140px;
   bottom: auto;
-}
-
-.page.is-search-fullscreen .bottom-search-dock {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .page.is-search-open .search-area {
@@ -376,10 +378,6 @@ body {
   border-radius: 32px 32px 0 0;
   background: #f4f8ff;
   overflow: hidden;
-}
-
-.search-overlay.is-fullscreen .search-overlay-frame {
-  border-radius: 0;
 }
 
 .panel-overlay {

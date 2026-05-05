@@ -8,6 +8,7 @@ const pendingLinksList = document.getElementById("pending-links-list");
 const scrollTail = document.getElementById("scroll-tail");
 const searchOverlay = document.getElementById("search-overlay");
 const searchOverlayBackdrop = document.getElementById("search-overlay-backdrop");
+const searchOverlayCollapseZone = document.getElementById("search-overlay-collapse-zone");
 const searchOverlayFrame = document.getElementById("search-overlay-frame");
 const profileLauncher = document.getElementById("profile-launcher");
 const groupsLauncher = document.getElementById("groups-launcher");
@@ -89,6 +90,7 @@ const detailParts = [
 ];
 const panelOrder = ["profile", "groups", "messages"];
 const skipSplashParam = "skipSplash";
+const directConversationsStorageKey = "linkDirectConversations";
 
 function redirectStandaloneHomepageToLogin() {
   if (window.top !== window || shouldSkipSplash()) {
@@ -185,7 +187,17 @@ function hideSplash() {
 
 function shouldSkipSplash() {
   const params = new URLSearchParams(window.location.search);
-  return params.get(skipSplashParam) === "1";
+  return params.get(skipSplashParam) === "1" && !isReloadNavigation();
+}
+
+function isReloadNavigation() {
+  const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+
+  if (navigationEntry) {
+    return navigationEntry.type === "reload";
+  }
+
+  return performance.navigation?.type === 1;
 }
 
 function cleanSkipSplashParam() {
@@ -216,6 +228,7 @@ function startSplash() {
     return;
   }
 
+  cleanSkipSplashParam();
   window.setTimeout(hideSplash, 3200);
 }
 
@@ -262,7 +275,7 @@ function buildMessageThreadUrl(title = "Message", returnTo = "") {
   return `${getGroupTextPagePath()}?${threadParams.toString()}`;
 }
 
-function buildEmbeddedSearchUrl(query = "") {
+function buildEmbeddedSearchUrl(query = "", restoreParams = {}) {
   const params = new URLSearchParams({
     embedded: "1",
     autofocus: "1"
@@ -271,6 +284,12 @@ function buildEmbeddedSearchUrl(query = "") {
   if (query.trim()) {
     params.set("search", query.trim());
   }
+
+  ["groupId", "centerLat", "centerLng"].forEach((key) => {
+    if (restoreParams[key]) {
+      params.set(key, restoreParams[key]);
+    }
+  });
 
   return `${getSearchPagePath()}?${params.toString()}`;
 }
@@ -387,11 +406,9 @@ function buildSuggestions(query) {
 }
 
 function resetPendingGroupsOnRefresh() {
-  const navigationEntries = performance.getEntriesByType("navigation");
-  const navigationType = navigationEntries[0]?.type;
-
-  if (navigationType === "reload") {
+  if (isReloadNavigation()) {
     localStorage.removeItem(storageKey);
+    localStorage.removeItem(directConversationsStorageKey);
   }
 }
 
@@ -484,15 +501,12 @@ function renderSuggestions(items) {
   });
 }
 
-function openSearchOverlay(query = "") {
+function openSearchOverlay(query = "", restoreParams = {}) {
   if (!searchOverlay || !searchOverlayFrame) {
     return;
   }
 
-  searchOverlay.classList.remove("is-fullscreen");
-  page?.classList.remove("is-search-fullscreen");
-
-  const nextUrl = buildEmbeddedSearchUrl(query);
+  const nextUrl = buildEmbeddedSearchUrl(query, restoreParams);
   const shouldRefreshFrame = !searchOverlayFrame.dataset.src;
 
   if (shouldRefreshFrame && searchOverlayFrame.dataset.src !== nextUrl) {
@@ -508,13 +522,7 @@ function openSearchOverlay(query = "") {
 }
 
 function expandSearchOverlay() {
-  if (!searchOverlay) {
-    return;
-  }
-
-  searchOverlay.classList.add("is-open", "is-fullscreen");
-  searchOverlay.setAttribute("aria-hidden", "false");
-  page?.classList.add("is-search-open", "is-search-fullscreen");
+  openSearchOverlay();
 }
 
 function collapseSearchOverlay() {
@@ -524,10 +532,8 @@ function collapseSearchOverlay() {
 
   resetShellNavBackground();
   searchOverlay.classList.add("is-open");
-  searchOverlay.classList.remove("is-fullscreen");
   searchOverlay.setAttribute("aria-hidden", "false");
   page?.classList.add("is-search-open");
-  page?.classList.remove("is-search-fullscreen");
 
 }
 
@@ -702,8 +708,7 @@ function closeSearchOverlay() {
   resetShellNavBackground();
   searchOverlay.classList.remove("is-open");
   searchOverlay.setAttribute("aria-hidden", "true");
-  searchOverlay.classList.remove("is-fullscreen");
-  page?.classList.remove("is-search-open", "is-search-fullscreen");
+  page?.classList.remove("is-search-open");
   embeddedSearchReady = false;
   pendingEmbeddedSearch = "";
 
@@ -759,6 +764,14 @@ function setupHeaderSearch() {
   });
 
   searchOverlayBackdrop?.addEventListener("click", () => {
+    if (Date.now() - searchOverlayOpenedAt < 220) {
+      return;
+    }
+
+    closeSearchOverlay();
+  });
+
+  searchOverlayCollapseZone?.addEventListener("click", () => {
     if (Date.now() - searchOverlayOpenedAt < 220) {
       return;
     }
@@ -973,6 +986,46 @@ function setupInitialPanelFromParams() {
   );
 }
 
+function setupInitialSearchFromParams() {
+  const pageParams = new URLSearchParams(window.location.search);
+
+  if (pageParams.get("searchOpen") !== "1") {
+    return false;
+  }
+
+  if (isReloadNavigation()) {
+    pageParams.delete("searchOpen");
+    pageParams.delete("search");
+    pageParams.delete("groupId");
+    pageParams.delete("centerLat");
+    pageParams.delete("centerLng");
+    pageParams.delete("embedded");
+    pageParams.delete(skipSplashParam);
+
+    const nextQuery = pageParams.toString();
+    window.history.replaceState(null, "", nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname);
+    return false;
+  }
+
+  openSearchOverlay(pageParams.get("search") || "", {
+    groupId: pageParams.get("groupId") || "",
+    centerLat: pageParams.get("centerLat") || "",
+    centerLng: pageParams.get("centerLng") || ""
+  });
+
+  pageParams.delete("searchOpen");
+  pageParams.delete("search");
+  pageParams.delete("groupId");
+  pageParams.delete("centerLat");
+  pageParams.delete("centerLng");
+  pageParams.delete("embedded");
+  pageParams.delete(skipSplashParam);
+
+  const nextQuery = pageParams.toString();
+  window.history.replaceState(null, "", nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname);
+  return true;
+}
+
 function renderCardTitles() {
   contentCards.forEach((card) => {
     const groupTitle = card.dataset.groupTitle;
@@ -1167,5 +1220,11 @@ if (!redirectStandaloneHomepageToLogin()) {
   setupHeaderSearch();
   setupPanelSwipes();
   setupInitialPanelFromParams();
-  startSplash();
+  const restoredSearch = setupInitialSearchFromParams();
+
+  if (restoredSearch) {
+    splashScreen?.classList.add("is-hidden");
+  } else {
+    startSplash();
+  }
 }

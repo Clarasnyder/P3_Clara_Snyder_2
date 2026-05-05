@@ -54,6 +54,8 @@ const shouldAutoFocus = pageParams.get("autofocus") === "1";
 const appHeightProperty = "--app-height";
 const visualViewportOffsetProperty = "--visual-viewport-offset-top";
 
+document.documentElement.classList.toggle("is-embedded", isEmbedded);
+
 function isTextEntryFocused() {
   const activeElement = document.activeElement;
 
@@ -943,6 +945,7 @@ function setupEmbeddedMode() {
   }
 
   document.body.classList.add("is-embedded");
+  document.documentElement.classList.add("is-embedded");
 
   const navItems = document.querySelectorAll(".bottom-nav .nav-item");
   const homeLink = navItems[0];

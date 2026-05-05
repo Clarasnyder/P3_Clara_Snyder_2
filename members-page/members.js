@@ -357,6 +357,15 @@ function readDirectConversations() {
   }
 }
 
+function resetDirectConversationsOnRefresh() {
+  const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+  const isReload = navigationEntry ? navigationEntry.type === "reload" : performance.navigation?.type === 1;
+
+  if (isReload) {
+    localStorage.removeItem(directConversationsStorageKey);
+  }
+}
+
 function saveDirectConversation(memberName) {
   const conversations = readDirectConversations();
   const nextConversation = {
@@ -571,6 +580,7 @@ function updateCenteredCard() {
   });
 }
 
+resetDirectConversationsOnRefresh();
 renderMembers();
 updateCenteredCard();
 

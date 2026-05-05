@@ -16,6 +16,20 @@ const directConversationsStorageKey = "linkDirectConversations";
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
 document.documentElement.classList.toggle("is-framed", isFramed);
 
+function isReloadNavigation() {
+  const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+
+  if (navigationEntry) {
+    return navigationEntry.type === "reload";
+  }
+
+  return performance.navigation?.type === 1;
+}
+
+if (isReloadNavigation()) {
+  localStorage.removeItem(directConversationsStorageKey);
+}
+
 const conversationSeed = {
   "Brunch Club": {
     subtitle: "24 members",
