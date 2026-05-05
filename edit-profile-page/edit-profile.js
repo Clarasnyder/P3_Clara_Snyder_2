@@ -132,6 +132,46 @@ function showPhotoCameraError(message) {
   photoCameraShutter.disabled = true;
 }
 
+async function requestPhotoCameraStream() {
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: "user" },
+        width: { ideal: 720 },
+        height: { ideal: 720 }
+      }
+    });
+  } catch (error) {
+    return navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: true
+    });
+  }
+}
+
+async function playPhotoCameraStream(stream) {
+  photoCameraVideo.muted = true;
+  photoCameraVideo.playsInline = true;
+  photoCameraVideo.setAttribute("playsinline", "");
+  photoCameraVideo.setAttribute("webkit-playsinline", "");
+  photoCameraVideo.srcObject = stream;
+
+  if (photoCameraVideo.readyState < 2) {
+    await new Promise((resolve) => {
+      const finish = () => {
+        photoCameraVideo.removeEventListener("loadedmetadata", finish);
+        resolve();
+      };
+
+      photoCameraVideo.addEventListener("loadedmetadata", finish, { once: true });
+      window.setTimeout(finish, 900);
+    });
+  }
+
+  await photoCameraVideo.play();
+}
+
 async function openPhotoCamera() {
   photoCameraOverlay.classList.add("is-open");
   photoCameraOverlay.setAttribute("aria-hidden", "false");
@@ -148,12 +188,7 @@ async function openPhotoCamera() {
   }
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: "user" }
-      }
-    });
+    const stream = await requestPhotoCameraStream();
 
     if (!photoCameraOverlay.classList.contains("is-open")) {
       stream.getTracks().forEach((track) => track.stop());
@@ -161,8 +196,7 @@ async function openPhotoCamera() {
     }
 
     photoCameraStream = stream;
-    photoCameraVideo.srcObject = stream;
-    await photoCameraVideo.play();
+    await playPhotoCameraStream(stream);
     photoCameraStatus.textContent = "Line up your photo";
     photoCameraShutter.disabled = false;
   } catch (error) {

@@ -479,6 +479,46 @@ function closeProofConfirmation() {
   proofConfirmation?.setAttribute("aria-hidden", "true");
 }
 
+async function requestCameraStream() {
+  try {
+    return await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: "user" },
+        width: { ideal: 720 },
+        height: { ideal: 720 }
+      }
+    });
+  } catch (error) {
+    return navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: true
+    });
+  }
+}
+
+async function playCameraStream(stream) {
+  cameraVideo.muted = true;
+  cameraVideo.playsInline = true;
+  cameraVideo.setAttribute("playsinline", "");
+  cameraVideo.setAttribute("webkit-playsinline", "");
+  cameraVideo.srcObject = stream;
+
+  if (cameraVideo.readyState < 2) {
+    await new Promise((resolve) => {
+      const finish = () => {
+        cameraVideo.removeEventListener("loadedmetadata", finish);
+        resolve();
+      };
+
+      cameraVideo.addEventListener("loadedmetadata", finish, { once: true });
+      window.setTimeout(finish, 900);
+    });
+  }
+
+  await cameraVideo.play();
+}
+
 async function startCameraProof() {
   resetCameraProof();
 
@@ -490,12 +530,7 @@ async function startCameraProof() {
   cameraFrame.classList.add("is-loading");
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: "user" }
-      }
-    });
+    const stream = await requestCameraStream();
 
     if (checkinCameraView.hidden) {
       stream.getTracks().forEach((track) => track.stop());
@@ -503,8 +538,7 @@ async function startCameraProof() {
     }
 
     cameraStream = stream;
-    cameraVideo.srcObject = stream;
-    await cameraVideo.play();
+    await playCameraStream(stream);
     cameraFrame.classList.remove("is-loading");
     cameraStatus.textContent = "Line up your proof";
     cameraShutterButton.disabled = false;
