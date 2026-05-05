@@ -259,6 +259,39 @@
         background: rgba(244, 248, 255, 0.16);
       }
 
+      .login-actions {
+        justify-self: center;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin: -2px 0 0;
+      }
+
+      .login-secondary-action {
+        border: 0;
+        background: transparent;
+        color: var(--splash-text);
+        font: 400 14px/1.2 "Poppins", Inter, "Helvetica Neue", Arial, sans-serif;
+        text-align: center;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        cursor: pointer;
+      }
+
+      .login-secondary-action:hover {
+        color: rgba(244, 248, 255, 0.82);
+      }
+
+      .login-secondary-action:active {
+        color: rgba(244, 248, 255, 0.68);
+      }
+
+      .login-secondary-action:focus-visible {
+        border-radius: 6px;
+        outline: 2px solid rgba(244, 248, 255, 0.78);
+        outline-offset: 3px;
+      }
+
       .login-submit {
         width: 100%;
         min-height: 52px;
@@ -417,7 +450,12 @@
             />
           </label>
 
-          <button class="login-submit" type="submit">lets link!</button>
+          <div class="login-actions">
+            <button class="login-secondary-action" type="button">Forgot password</button>
+            <button class="login-secondary-action" type="button">Sign up</button>
+          </div>
+
+          <button class="login-submit" type="submit">Lets link!</button>
           <p class="login-error" id="login-error">Check your username and password.</p>
         </form>
       </div>
