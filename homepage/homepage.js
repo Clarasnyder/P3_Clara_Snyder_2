@@ -264,8 +264,7 @@ function buildMessageThreadUrl(title = "Message", returnTo = "") {
 
 function buildEmbeddedSearchUrl(query = "") {
   const params = new URLSearchParams({
-    embedded: "1",
-    autofocus: "1"
+    embedded: "1"
   });
 
   if (query.trim()) {
@@ -727,6 +726,7 @@ function setupHeaderSearch() {
 
   searchInput.addEventListener("focus", () => {
     openSearchOverlay();
+    searchInput.blur();
 
     const suggestions = buildSuggestions(searchInput.value);
 
@@ -738,6 +738,7 @@ function setupHeaderSearch() {
 
   searchInput.addEventListener("click", () => {
     openSearchOverlay();
+    searchInput.blur();
   });
 
   searchInput.addEventListener("input", () => {
