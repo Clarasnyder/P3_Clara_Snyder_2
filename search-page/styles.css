@@ -677,7 +677,7 @@ body.is-embedded .map-frame .maplibregl-ctrl-bottom-right {
   }
 
   html.is-keyboard-frozen .phone-viewport {
-    transform: translateY(var(--visual-viewport-offset-top, 0px));
+    transform: none;
   }
 
   .hero-banner {

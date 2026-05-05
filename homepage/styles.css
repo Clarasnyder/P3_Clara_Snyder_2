@@ -819,7 +819,7 @@ body {
   }
 
   html.is-keyboard-frozen .phone-viewport {
-    transform: translateY(var(--visual-viewport-offset-top, 0px));
+    transform: none;
   }
 
   .page.is-search-open .bottom-search-dock {

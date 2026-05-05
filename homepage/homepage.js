@@ -129,6 +129,12 @@ function clearVisualViewportOffset() {
   document.documentElement.classList.remove("is-keyboard-frozen");
 }
 
+function keepViewportPinned() {
+  if (isTextEntryFocused()) {
+    window.scrollTo(0, 0);
+  }
+}
+
 function setupStableViewport() {
   if ("virtualKeyboard" in navigator) {
     try {
@@ -148,12 +154,19 @@ function setupStableViewport() {
   });
   window.visualViewport?.addEventListener("resize", () => {
     setVisualViewportOffset();
+    keepViewportPinned();
     if (!isTextEntryFocused()) {
       setStableAppHeight();
     }
   });
-  window.visualViewport?.addEventListener("scroll", setVisualViewportOffset);
-  window.addEventListener("focusin", setVisualViewportOffset);
+  window.visualViewport?.addEventListener("scroll", () => {
+    setVisualViewportOffset();
+    keepViewportPinned();
+  });
+  window.addEventListener("focusin", () => {
+    setVisualViewportOffset();
+    window.setTimeout(keepViewportPinned, 0);
+  });
   window.addEventListener("focusout", () => {
     window.setTimeout(clearVisualViewportOffset, 80);
   });
