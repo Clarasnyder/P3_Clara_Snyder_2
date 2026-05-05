@@ -605,6 +605,20 @@ body.is-embedded .bottom-nav {
   display: none;
 }
 
+body.is-embedded .page,
+body.is-embedded .map-layer,
+body.is-embedded .map-frame,
+body.is-embedded .map-frame .maplibregl-map,
+body.is-embedded .map-frame .maplibregl-canvas {
+  border-radius: 32px 32px 0 0;
+}
+
+body.is-embedded .page,
+body.is-embedded .map-layer,
+body.is-embedded .map-frame {
+  overflow: hidden;
+}
+
 body.is-embedded .map-layer {
   inset: 0;
 }
