@@ -472,6 +472,7 @@
       const homeFrame = document.getElementById("home-frame");
       const pageParams = new URLSearchParams(window.location.search);
       const shouldShowLoginOnly = pageParams.get("login") === "1";
+      const pendingLinksStorageKey = "linkRequests";
       let stableAppHeight = window.innerHeight;
 
       function isTextEntryFocused() {
@@ -543,6 +544,7 @@
         if (username === "clarasnyder" && password === "password") {
           loginError.classList.remove("is-visible");
           cleanLoginParam();
+          localStorage.removeItem(pendingLinksStorageKey);
           splashScreen.classList.add("is-complete");
           loginScreen.classList.add("is-complete");
           loginScreen.classList.remove("is-open");
