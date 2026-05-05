@@ -24,7 +24,6 @@ const proofRetakeButton = document.getElementById("proof-retake-button");
 const proofSubmitButton = document.getElementById("proof-submit-button");
 const backLink = document.getElementById("back-link");
 const pageElement = document.getElementById("group-page");
-const nativeProofInput = document.createElement("input");
 
 const params = new URLSearchParams(window.location.search);
 const rawTitle = params.get("title") || "Pickleball";
@@ -41,11 +40,6 @@ const rawDescription =
   "Welcoming local meetups for pickleball, with easy conversation and making new friends.";
 
 document.documentElement.classList.toggle("is-search-embedded", isSearchEmbedded);
-nativeProofInput.type = "file";
-nativeProofInput.accept = "image/*";
-nativeProofInput.capture = "user";
-nativeProofInput.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;";
-document.body.appendChild(nativeProofInput);
 
 const backTargets = {
   search: "../search-page/index.html",
@@ -485,18 +479,6 @@ function closeProofConfirmation() {
   proofConfirmation?.setAttribute("aria-hidden", "true");
 }
 
-function shouldUseNativeProofCapture() {
-  return window.matchMedia("(pointer: coarse), (max-width: 760px)").matches;
-}
-
-function openNativeProofCapture() {
-  cameraFrame.classList.remove("has-error", "is-loading");
-  cameraStatus.textContent = "Opening camera";
-  cameraShutterButton.disabled = false;
-  nativeProofInput.value = "";
-  nativeProofInput.click();
-}
-
 async function requestCameraStream() {
   try {
     return await navigator.mediaDevices.getUserMedia({
@@ -587,47 +569,13 @@ function captureCameraProof() {
   openProofConfirmation();
 }
 
-function captureNativeProof(file) {
-  const reader = new FileReader();
-
-  reader.addEventListener("load", () => {
-    const image = new Image();
-
-    image.addEventListener("load", () => {
-      const width = image.naturalWidth || 640;
-      const height = image.naturalHeight || 480;
-      const context = cameraCanvas.getContext("2d");
-
-      cameraCanvas.width = width;
-      cameraCanvas.height = height;
-      context.drawImage(image, 0, 0, width, height);
-      cameraFrame.classList.remove("is-loading", "has-error");
-      cameraFrame.classList.add("has-photo");
-      cameraCanvas.hidden = false;
-      cameraVideo.hidden = true;
-      cameraStatus.textContent = "Proof captured";
-      cameraShutterButton.disabled = false;
-      cameraShutterButton.setAttribute("aria-label", "Retake photo");
-      openProofConfirmation();
-    });
-
-    image.src = String(reader.result || "");
-  });
-
-  reader.readAsDataURL(file);
-}
-
 function retakeCameraProof() {
   cameraFrame.classList.remove("has-photo");
   closeProofConfirmation();
   cameraCanvas.hidden = true;
-  cameraVideo.hidden = shouldUseNativeProofCapture();
+  cameraVideo.hidden = false;
   cameraStatus.textContent = "Line up your proof";
   cameraShutterButton.setAttribute("aria-label", "Take photo");
-
-  if (shouldUseNativeProofCapture()) {
-    openNativeProofCapture();
-  }
 }
 
 function showCheckinTaskView() {
@@ -643,14 +591,6 @@ function showCheckinCameraView() {
   checkinCameraView.hidden = false;
   checkinCameraView.setAttribute("aria-hidden", "false");
   checkinOverlay.classList.add("is-camera");
-
-  if (shouldUseNativeProofCapture()) {
-    resetCameraProof();
-    cameraVideo.hidden = true;
-    openNativeProofCapture();
-    return;
-  }
-
   startCameraProof();
 }
 
@@ -804,24 +744,7 @@ cameraShutterButton.addEventListener("click", () => {
     return;
   }
 
-  if (shouldUseNativeProofCapture()) {
-    openNativeProofCapture();
-    return;
-  }
-
   captureCameraProof();
-});
-
-nativeProofInput.addEventListener("change", () => {
-  const file = nativeProofInput.files?.[0];
-
-  if (!file) {
-    cameraStatus.textContent = "No photo selected";
-    cameraShutterButton.disabled = false;
-    return;
-  }
-
-  captureNativeProof(file);
 });
 
 proofRetakeButton.addEventListener("click", retakeCameraProof);

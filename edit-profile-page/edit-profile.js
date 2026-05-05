@@ -26,16 +26,10 @@ const defaultProfile = {
   bio: "Into brunch plans, creative projects, and meeting new people around town.",
   photo: ""
 };
-const nativePhotoInput = document.createElement("input");
 let photoCameraStream = null;
 let capturedProfilePhoto = "";
 
 document.documentElement.classList.toggle("is-embedded", isEmbedded);
-nativePhotoInput.type = "file";
-nativePhotoInput.accept = "image/*";
-nativePhotoInput.capture = "user";
-nativePhotoInput.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none;";
-document.body.appendChild(nativePhotoInput);
 
 function postPanelNavigation(panel) {
   window.parent.postMessage({ type: "navigate-panel", panel }, "*");
@@ -138,15 +132,6 @@ function showPhotoCameraError(message) {
   photoCameraShutter.disabled = true;
 }
 
-function shouldUseNativePhotoCapture() {
-  return window.matchMedia("(pointer: coarse), (max-width: 760px)").matches;
-}
-
-function openNativePhotoCapture() {
-  nativePhotoInput.value = "";
-  nativePhotoInput.click();
-}
-
 async function requestPhotoCameraStream() {
   try {
     return await navigator.mediaDevices.getUserMedia({
@@ -188,11 +173,6 @@ async function playPhotoCameraStream(stream) {
 }
 
 async function openPhotoCamera() {
-  if (shouldUseNativePhotoCapture()) {
-    openNativePhotoCapture();
-    return;
-  }
-
   photoCameraOverlay.classList.add("is-open");
   photoCameraOverlay.setAttribute("aria-hidden", "false");
   photoCameraFrame.classList.remove("has-error");
@@ -253,20 +233,6 @@ avatarButton?.addEventListener("click", openPhotoCamera);
 photoCameraClose?.addEventListener("click", closePhotoCamera);
 
 photoCameraShutter?.addEventListener("click", captureProfilePhoto);
-
-nativePhotoInput.addEventListener("change", () => {
-  const file = nativePhotoInput.files?.[0];
-
-  if (!file) {
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    applyAvatarPhoto(String(reader.result || ""));
-  });
-  reader.readAsDataURL(file);
-});
 
 photoCameraOverlay?.addEventListener("click", (event) => {
   if (event.target === photoCameraOverlay) {
